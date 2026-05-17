@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript শেখা — Class 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --surface: #141728;
+    --surface2: #1c2035;
+    --border: #2a2f4a;
+    --accent: #f0c040;
+    --accent2: #5c9eff;
+    --accent3: #7effd4;
+    --accent4: #ff7eb3;
+    --text: #e8eaf6;
+    --text-muted: #8892b0;
+    --keyword: #f0c040;
+    --code-bg: #0a0c14;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px;
+    line-height: 1.85;
+    min-height: 100vh;
+  }
+
+  /* Animated starfield background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,0.15) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.2) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .class-header {
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, #141728 0%, #1a1f3a 100%);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .class-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(240,192,64,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .class-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d0f1a;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .class-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .class-header h1 span { color: var(--accent); }
+
+  .class-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .meta-item .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent3);
+    flex-shrink: 0;
+  }
+
+  /* Topics index */
+  .topics-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+
+  .topics-box h3 {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+  }
+
+  .topics-box ol {
+    padding-left: 20px;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .topics-box ol li {
+    margin-bottom: 6px;
+  }
+
+  .topics-box ol li strong {
+    color: var(--text);
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-num {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    color: #0d0f1a;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-title h2 span {
+    color: var(--accent);
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+
+  /* Keyword highlight */
+  .kw {
+    color: var(--keyword);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.93em;
+    background: rgba(240,192,64,0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .kw-blue {
+    color: var(--accent2);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.93em;
+    background: rgba(92,158,255,0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .kw-green {
+    color: var(--accent3);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.93em;
+    background: rgba(126,255,212,0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* Info/note box */
+  .info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 15.5px;
+  }
+
+  .info-box .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .warn-box {
+    background: rgba(240,192,64,0.06);
+    border: 1px solid rgba(240,192,64,0.25);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 15.5px;
+  }
+
+  .warn-box .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  /* Example block */
+  .example-block {
+    margin: 20px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .example-header {
+    background: var(--surface2);
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .example-label {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent4);
+    font-weight: 600;
+  }
+
+  .example-title {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .example-body {
+    padding: 16px 20px;
+    background: var(--surface);
+    font-size: 15.5px;
+    line-height: 1.8;
+  }
+
+  /* Code block */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  .code-top {
+    background: #111422;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dots {
+    display: flex; gap: 6px;
+  }
+
+  .code-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .code-dots span:nth-child(1) { background: #ff5f57; }
+  .code-dots span:nth-child(2) { background: #ffbd2e; }
+  .code-dots span:nth-child(3) { background: #28c840; }
+
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  pre {
+    padding: 18px 20px;
+    font-family: 'Fira Code', monospace;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: #cdd6f4;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .c-keyword { color: #cba6f7; }
+  .c-string  { color: #a6e3a1; }
+  .c-num     { color: #fab387; }
+  .c-func    { color: #89dceb; }
+  .c-comment { color: #585b70; font-style: italic; }
+  .c-var     { color: #cdd6f4; }
+  .c-punc    { color: #89b4fa; }
+
+  /* Output box */
+  .output-box {
+    background: #060810;
+    border: 1px solid #1e2235;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-top: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    color: var(--accent3);
+  }
+
+  .output-box .out-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* Analogy box */
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(92,158,255,0.06) 0%, rgba(126,255,212,0.04) 100%);
+    border: 1px solid rgba(92,158,255,0.2);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 16px 0;
+  }
+
+  .analogy-box .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* Test section */
+  .test-section {
+    background: linear-gradient(135deg, #141728 0%, #1a1430 100%);
+    border: 1px solid rgba(240,192,64,0.3);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-top: 48px;
+  }
+
+  .test-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .test-icon {
+    font-size: 28px;
+  }
+
+  .test-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .test-header h2 small {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .question {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+  }
+
+  .question .q-num {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .question p {
+    margin: 0;
+    font-size: 15.5px;
+  }
+
+  .question .sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  /* Completion banner */
+  .complete-banner {
+    text-align: center;
+    padding: 32px;
+    margin-top: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .complete-banner h3 {
+    font-size: 1.1rem;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+
+  .complete-banner p {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  ul.list {
+    padding-left: 22px;
+    margin: 10px 0 14px;
+  }
+
+  ul.list li {
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  @media (max-width: 600px) {
+    .wrapper { padding: 20px 14px 60px; }
+    .class-header { padding: 24px 20px; }
+    .class-header h1 { font-size: 1.5rem; }
+    .test-section { padding: 22px 18px; }
+    pre { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="class-header">
+    <div class="class-badge">Class 01</div>
+    <h1>JavaScript শেখার যাত্রা শুরু 🚀<br><span>একদম গোড়া থেকে</span></h1>
+    <div class="class-meta">
+      <div class="meta-item"><span class="dot"></span>বাংলায় লেখা</div>
+      <div class="meta-item"><span class="dot" style="background:var(--accent)"></span>শিক্ষার্থী: তোমার ছোট ভাই</div>
+      <div class="meta-item"><span class="dot" style="background:var(--accent4)"></span>Level: একদম শূন্য থেকে</div>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="topics-box">
+    <h3>আজকে কী কী শিখব</h3>
+    <ol>
+      <li><strong>Computer কী এবং এটা কীভাবে কাজ করে (সহজভাবে)</strong></li>
+      <li><strong>Internet এবং Web Browser কী</strong></li>
+      <li><strong>Website কী এবং এটা কোথায় থাকে</strong></li>
+      <li><strong>Programming Language কী — কেন দরকার</strong></li>
+      <li><strong>JavaScript কী এবং কেন শিখব</strong></li>
+      <li><strong>আমাদের প্রথম JavaScript Code লেখা</strong></li>
+      <li><strong>Class শেষে Test</strong></li>
+    </ol>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">১</div>
+      <h2><span>Computer</span> কী এবং এটা কীভাবে কাজ করে?</h2>
+    </div>
+
+    <p>
+      তুমি নিশ্চয়ই <span class="kw">Computer</span> দেখেছ — হয়তো বাসায়, স্কুলে, বা দোকানে।
+      <span class="kw">Computer</span> হলো একটা বিদ্যুৎচালিত যন্ত্র (<em>machine</em>) যেটা তোমার দেওয়া নির্দেশ (<em>instruction</em>) মেনে কাজ করে।
+      মোবাইল ফোনও একটা <span class="kw">Computer</span> — ছোট, কিন্তু কাজ একই।
+    </p>
+
+    <div class="analogy-box">
+      <div class="label">🧠 সহজ উদাহরণ দিয়ে বুঝি</div>
+      <p>
+        ধরো তুমি তোমার ছোট বোনকে বললে: <em>"রান্নাঘর থেকে এক গ্লাস পানি নিয়ে আসো।"</em>
+        সে বুঝলো, গেল, এনে দিল। ঠিক একইভাবে, <span class="kw">Computer</span>কে তুমি নির্দেশ দাও — সে সেটা অনুসরণ করে।
+        পার্থক্য হলো, <span class="kw">Computer</span> শুধু একটা নির্দিষ্ট ভাষায় বোঝে — সেই ভাষাকে বলে <span class="kw">Programming Language</span>।
+        সেটা আমরা একটু পরে শিখব।
+      </p>
+    </div>
+
+    <p>
+      <span class="kw">Computer</span>-এর ভেতরে একটা অনেক গুরুত্বপূর্ণ অংশ থাকে যার নাম <span class="kw">CPU</span>
+      (<em>Central Processing Unit</em>)। এটাকে বলে <span class="kw">Computer</span>-এর "মাথা" বা "ব্রেইন"।
+      তুমি যা নির্দেশ দাও, <span class="kw">CPU</span> সেটা হিসাব করে এবং কাজ করে।
+    </p>
+
+    <div class="info-box">
+      <div class="label">💡 মনে রাখো</div>
+      Computer-কে নির্দেশ দেওয়ার জন্য যে বিশেষ ভাষা ব্যবহার করা হয় সেটার নাম <span class="kw">Programming Language</span>।
+      আর যে মানুষ এই ভাষায় নির্দেশ লেখে তাকে বলে <span class="kw">Programmer</span> বা <span class="kw">Developer</span>।
+      তুমিও এই Class-গুলো শেষে একজন <span class="kw">Developer</span> হয়ে যাবে! 🎯
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">২</div>
+      <h2><span>Internet</span> এবং <span>Web Browser</span> কী?</h2>
+    </div>
+
+    <p>
+      <span class="kw">Internet</span> হলো পৃথিবীজুড়ে লক্ষ কোটি <span class="kw">Computer</span>-এর একটা বিশাল নেটওয়ার্ক (<em>network</em>) — মানে সব <span class="kw">Computer</span> একে অপরের সাথে সংযুক্ত (<em>connected</em>)।
+      তুমি যখন YouTube দেখো বা Google-এ কিছু সার্চ করো, তখন তোমার ফোন বা <span class="kw">Computer</span> এই <span class="kw">Internet</span>-এর মাধ্যমে অনেক দূরের আরেকটা <span class="kw">Computer</span> (যাকে বলে <span class="kw">Server</span>) থেকে তথ্য নিয়ে আসে।
+    </p>
+
+    <div class="analogy-box">
+      <div class="label">🧠 সহজ উদাহরণ</div>
+      <p>
+        ধরো <span class="kw">Internet</span> হলো একটা বিশাল রাস্তার নেটওয়ার্ক, যেটা দিয়ে সারা দুনিয়ায় তথ্য (<em>information/data</em>) যাতায়াত করে।
+        আর তোমার ফোন বা <span class="kw">Computer</span> হলো একটা বাড়ি যেটা ওই রাস্তার সাথে যুক্ত।
+      </p>
+    </div>
+
+    <p>
+      এখন আসি <span class="kw">Web Browser</span>-এ। <span class="kw">Web Browser</span> হলো একটা <span class="kw">Software</span> (<em>program</em>) যেটা দিয়ে তুমি <span class="kw">Internet</span>-এ ঘুরতে পারো এবং <span class="kw">Website</span> দেখতে পারো।
+    </p>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ১</span>
+        <span class="example-title">বিখ্যাত Web Browser-গুলো</span>
+      </div>
+      <div class="example-body">
+        তুমি নিশ্চয়ই এগুলো দেখেছ বা ব্যবহার করেছ:
+        <ul class="list">
+          <li>🔵 <span class="kw">Google Chrome</span> — সবচেয়ে বেশি ব্যবহৃত Browser</li>
+          <li>🟠 <span class="kw">Mozilla Firefox</span> — আরেকটা জনপ্রিয় Browser</li>
+          <li>🔷 <span class="kw">Microsoft Edge</span> — Windows Computer-এ থাকে</li>
+          <li>🍎 <span class="kw">Safari</span> — iPhone ও Mac-এ থাকে</li>
+        </ul>
+        তোমার ফোনে এখন যেটা দিয়ে Website দেখো — সেটাই তোমার <span class="kw">Web Browser</span>।
+      </div>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ২</span>
+        <span class="example-title">Browser কীভাবে কাজ করে — সহজ ভাষায়</span>
+      </div>
+      <div class="example-body">
+        তুমি <span class="kw">Google Chrome</span>-এ গিয়ে টাইপ করলে: <span class="kw-blue">www.youtube.com</span><br><br>
+        এই ঘটনাগুলো ঘটে:
+        <ul class="list">
+          <li>১. Chrome তোমার <span class="kw">Internet</span>-এর মাধ্যমে YouTube-এর <span class="kw">Server</span>-এ একটা request পাঠায় — মানে বলে "ভাই, YouTube-এর পাতাটা দাও!"</li>
+          <li>২. YouTube-এর <span class="kw">Server</span> response দেয় — মানে পাতার সব তথ্য পাঠিয়ে দেয়।</li>
+          <li>৩. Chrome সেই তথ্য নিয়ে তোমার স্ক্রিনে সুন্দর করে সাজিয়ে দেখায়।</li>
+        </ul>
+        এই পুরো কাজটা এত দ্রুত হয় যে তুমি টের পাওই না!
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">৩</div>
+      <h2><span>Website</span> কী এবং এটা কোথায় থাকে?</h2>
+    </div>
+
+    <p>
+      <span class="kw">Website</span> হলো <span class="kw">Internet</span>-এ থাকা একটা পাতা বা পাতার সমষ্টি যেটা তুমি <span class="kw">Web Browser</span>-এ দেখতে পারো।
+      যেমন: YouTube, Facebook, Wikipedia — এগুলো সবই <span class="kw">Website</span>।
+    </p>
+
+    <p>
+      এই <span class="kw">Website</span>-গুলো কোথায় থাকে? সেগুলো থাকে বিশেষ শক্তিশালী <span class="kw">Computer</span>-এ — যার নাম <span class="kw">Server</span>।
+      <span class="kw">Server</span> মানে এমন একটা <span class="kw">Computer</span> যেটা সবসময় চালু থাকে এবং যেকোনো মানুষ <span class="kw">Internet</span>-এর মাধ্যমে সেখান থেকে তথ্য নিতে পারে।
+    </p>
+
+    <div class="analogy-box">
+      <div class="label">🧠 সহজ উদাহরণ</div>
+      <p>
+        ধরো একটা বিশাল <em>Library</em> (পাঠাগার) আছে — সেটাই <span class="kw">Server</span>।
+        সেই Library-তে অনেক বই আছে — সেগুলোই <span class="kw">Website</span>।
+        আর তুমি Library-তে যে রাস্তা দিয়ে যাও সেটা <span class="kw">Internet</span>।
+        তুমি যখন Library-তে গিয়ে বই পড়ো — সেটাই <span class="kw">Web Browser</span>-এ <span class="kw">Website</span> দেখা।
+      </p>
+    </div>
+
+    <p>
+      প্রতিটা <span class="kw">Website</span>-এর একটা নিজস্ব ঠিকানা আছে — যার নাম <span class="kw">URL</span> (<em>Uniform Resource Locator</em>)।
+      যেমন: <span class="kw-blue">www.google.com</span> বা <span class="kw-blue">www.facebook.com</span> — এগুলো হলো <span class="kw">URL</span>।
+      এটাকে ভাবো বাড়ির ঠিকানার মতো — প্রতিটা বাড়ির আলাদা ঠিকানা থাকে, তেমনি প্রতিটা <span class="kw">Website</span>-এর আলাদা <span class="kw">URL</span> থাকে।
+    </p>
+
+    <div class="info-box">
+      <div class="label">💡 একটা Website আসলে কী দিয়ে তৈরি?</div>
+      <p>প্রতিটা <span class="kw">Website</span> মূলত তিনটা জিনিস দিয়ে তৈরি:</p>
+      <ul class="list" style="margin-top:8px">
+        <li>🏗️ <span class="kw">HTML</span> (<em>HyperText Markup Language</em>) — এটা <span class="kw">Website</span>-এর <strong>কাঠামো</strong> তৈরি করে। যেমন বাড়ির ইট-পাথর।</li>
+        <li>🎨 <span class="kw">CSS</span> (<em>Cascading Style Sheets</em>) — এটা <span class="kw">Website</span>-কে <strong>সুন্দর</strong> করে সাজায়। যেমন বাড়ির রঙ ও ডিজাইন।</li>
+        <li>⚡ <span class="kw">JavaScript</span> — এটা <span class="kw">Website</span>-কে <strong>জীবন্ত ও কার্যকর</strong> করে। যেমন বাড়ির বিদ্যুৎ — আলো জ্বলে, ফ্যান চলে।</li>
+      </ul>
+      আমরা <span class="kw">JavaScript</span> শিখছি — এটাই সবচেয়ে মজার অংশ!
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">৪</div>
+      <h2><span>Programming Language</span> কী?</h2>
+    </div>
+
+    <p>
+      তুমি আর আমি কথা বলি বাংলায় বা ইংরেজিতে — এগুলো <em>Human Language</em> (মানুষের ভাষা)।
+      কিন্তু <span class="kw">Computer</span> মানুষের ভাষা বোঝে না।
+      <span class="kw">Computer</span> আসলে শুধু বোঝে <span class="kw">0</span> আর <span class="kw">1</span> — যেটাকে বলে <span class="kw">Binary</span>।
+    </p>
+
+    <div class="analogy-box">
+      <div class="label">🧠 সহজ উদাহরণ</div>
+      <p>
+        মনে করো তুমি একজন বাংলাদেশি, আর তোমার বন্ধু শুধু জাপানি ভাষা বোঝে।
+        তোমাদের মাঝে কথা বলতে হলে একজন <em>Translator</em> (অনুবাদক) দরকার।
+        <span class="kw">Programming Language</span> হলো সেই <em>Translator</em> —
+        তুমি <span class="kw">Code</span> লেখো, আর সেই <span class="kw">Code</span> <span class="kw">Computer</span>-এর ভাষায় (<span class="kw">0</span> ও <span class="kw">1</span>-এ) রূপান্তরিত হয়ে <span class="kw">Computer</span>-কে বোঝানো হয়।
+      </p>
+    </div>
+
+    <p>
+      পৃথিবীতে অনেক রকমের <span class="kw">Programming Language</span> আছে। কিছু বিখ্যাত নাম:
+    </p>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ১</span>
+        <span class="example-title">বিখ্যাত Programming Language-গুলো</span>
+      </div>
+      <div class="example-body">
+        <ul class="list">
+          <li>⚡ <span class="kw">JavaScript</span> — Website-কে জীবন্ত করে (আমরা এটাই শিখব!)</li>
+          <li>🐍 <span class="kw">Python</span> — AI, Data Science-এ ব্যবহার হয়</li>
+          <li>☕ <span class="kw">Java</span> — Android app তৈরিতে ব্যবহার হয়</li>
+          <li>🎮 <span class="kw">C++</span> — গেম তৈরিতে ব্যবহার হয়</li>
+        </ul>
+        এগুলো আলাদা আলাদা ভাষা, আলাদা আলাদা কাজে লাগে। কিন্তু সবই শেখা যায়!
+      </div>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ২</span>
+        <span class="example-title">Code আসলে কী দেখতে?</span>
+      </div>
+      <div class="example-body">
+        <p>এটা একটা <span class="kw">JavaScript</span> <span class="kw">Code</span>-এর উদাহরণ। ভয় পেও না — এখন না বুঝলেও চলবে, পরে সব বুঝবে:</p>
+        <div class="code-block">
+          <div class="code-top">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-lang">JavaScript</span>
+          </div>
+          <pre><span class="c-comment">// এটা একটা সহজ JavaScript code</span>
+<span class="c-keyword">let</span> <span class="c-var">name</span> <span class="c-punc">=</span> <span class="c-string">"রাফি"</span><span class="c-punc">;</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-string">"হ্যালো, "</span> <span class="c-punc">+</span> <span class="c-var">name</span><span class="c-punc">);</span></pre>
+        </div>
+        <div class="output-box">
+          <div class="out-label">Output (ফলাফল)</div>
+          হ্যালো, রাফি
+        </div>
+        এই <span class="kw">Code</span> চালালে <span class="kw">Computer</span> লিখে দেবে: <strong>হ্যালো, রাফি</strong> — এটাই <span class="kw">Programming</span>!
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">৫</div>
+      <h2><span>JavaScript</span> কী এবং কেন শিখব?</h2>
+    </div>
+
+    <p>
+      <span class="kw">JavaScript</span> (<span class="kw">JS</span> নামেও পরিচিত) হলো একটি <span class="kw">Programming Language</span>।
+      এটা ১৯৯৫ সালে তৈরি হয়েছিল, এবং এখন এটা পৃথিবীর সবচেয়ে বেশি ব্যবহৃত <span class="kw">Programming Language</span>গুলোর একটা।
+    </p>
+
+    <p>
+      <span class="kw">JavaScript</span>-এর বিশেষত্ব হলো — এটা সরাসরি <span class="kw">Web Browser</span>-এ চলে।
+      মানে তুমি <span class="kw">Chrome</span> বা <span class="kw">Firefox</span> খুললেই সেখানে <span class="kw">JavaScript</span> চালাতে পারবে — আলাদা কোনো বড় <span class="kw">Software</span> লাগবে না!
+    </p>
+
+    <div class="warn-box">
+      <div class="label">⚡ গুরুত্বপূর্ণ তথ্য — নাম নিয়ে বিভ্রান্তি!</div>
+      <p>
+        <span class="kw">JavaScript</span> এবং <span class="kw">Java</span> — নাম দেখে মনে হয় একই জিনিস, কিন্তু আসলে এরা সম্পূর্ণ আলাদা!
+        এটা যেন "ইন্দোনেশিয়া" আর "ইন্ডিয়া" — নামে মিল আছে, কিন্তু সম্পূর্ণ ভিন্ন দেশ।
+        তাই কখনো গুলিয়ে ফেলবে না।
+      </p>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ১</span>
+        <span class="example-title">JavaScript দিয়ে কী কী করা যায়?</span>
+      </div>
+      <div class="example-body">
+        <ul class="list">
+          <li>🎮 <strong>Browser-এ গেম বানানো</strong> — যেমন Flappy Bird টাইপের গেম!</li>
+          <li>🛒 <strong>E-commerce Website</strong> — যেখানে জিনিস কিনতে পারবে, Cart-এ যোগ করতে পারবে</li>
+          <li>💬 <strong>Chat App</strong> — WhatsApp-এর মতো messaging app</li>
+          <li>📊 <strong>Dashboard</strong> — সুন্দর গ্রাফ ও চার্ট দেখানো</li>
+          <li>🤖 <strong>এমনকি AI-ও</strong> — ChatGPT-এর Website-ও JavaScript দিয়ে তৈরি!</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ২</span>
+        <span class="example-title">JavaScript ছাড়া Website কেমন হতো?</span>
+      </div>
+      <div class="example-body">
+        <p>
+          মনে করো তুমি Facebook-এ Like বাটনে ক্লিক করলে — সাথে সাথে সংখ্যাটা বাড়লো।
+          এটা <span class="kw">JavaScript</span>-এর কাজ।<br><br>
+          <span class="kw">JavaScript</span> না থাকলে — পাতা <em>reload</em> (মানে পুরো পাতা আবার লোড) করতে হতো শুধু একটা Like দিতে।
+          <span class="kw">JavaScript</span> Website-কে <em>dynamic</em> (গতিশীল, সজীব) করে তোলে।
+          <span class="kw">JavaScript</span> ছাড়া Website হবে একটা স্থির ছবির মতো — ক্লিক করলে কিছুই হবে না।
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">৬</div>
+      <h2>আমাদের প্রথম <span>JavaScript Code</span> লেখা!</h2>
+    </div>
+
+    <p>
+      এবার মজার অংশ! তুমি এখনই নিজের <span class="kw">Computer</span> বা ফোনে <span class="kw">JavaScript</span> চালাবে।
+      কোনো বড় <span class="kw">Software</span> লাগবে না — শুধু <span class="kw">Web Browser</span> লাগবে।
+    </p>
+
+    <div class="info-box">
+      <div class="label">🔧 Console কী?</div>
+      <p>
+        <span class="kw">Web Browser</span>-এর ভেতরে একটা গোপন টুল আছে যার নাম <span class="kw">Console</span>।
+        এটা <span class="kw">Developer</span>-দের জন্য তৈরি একটা জায়গা যেখানে তুমি সরাসরি <span class="kw">JavaScript Code</span> লিখে চালাতে পারো।
+        <span class="kw">Console</span> খুলতে হয় <span class="kw">F12</span> চেপে, তারপর "Console" ট্যাবে ক্লিক করে।
+        (ফোনে এটা একটু কঠিন, <span class="kw">Computer</span>-এ বেশি সহজ।)
+      </p>
+    </div>
+
+    <p><strong>এখন নিচের ধাপগুলো অনুসরণ করো:</strong></p>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">হাতে-কলমে</span>
+        <span class="example-title">Console খুলে প্রথম Code চালাও</span>
+      </div>
+      <div class="example-body">
+        <ul class="list">
+          <li>১. <span class="kw">Google Chrome</span> Browser খোলো।</li>
+          <li>২. Keyboard-এ <span class="kw">F12</span> চাপো (অথবা Mouse-এর Right Click করে "Inspect" বা "পরীক্ষা করো" তে ক্লিক করো)।</li>
+          <li>৩. ওপরে অনেকগুলো ট্যাব দেখবে — সেখান থেকে "<span class="kw">Console</span>" তে ক্লিক করো।</li>
+          <li>৪. নিচে একটা খালি জায়গা দেখবে যেখানে টাইপ করা যায়।</li>
+          <li>৫. সেখানে এটা টাইপ করো এবং <span class="kw">Enter</span> চাপো:</li>
+        </ul>
+        <div class="code-block">
+          <div class="code-top">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-lang">Console-এ টাইপ করো</span>
+          </div>
+          <pre><span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-string">"আমি JavaScript শিখছি!"</span><span class="c-punc">);</span></pre>
+        </div>
+        <div class="output-box">
+          <div class="out-label">তুমি দেখতে পাবে</div>
+          আমি JavaScript শিখছি!
+        </div>
+        <p style="margin-top:12px">অভিনন্দন! 🎉 তুমি এইমাত্র তোমার জীবনের প্রথম <span class="kw">JavaScript Code</span> চালালে!</p>
+      </div>
+    </div>
+
+    <p>
+      এখন এই <span class="kw">Code</span>-টা একটু ভাঙি বুঝিয়ে:
+    </p>
+
+    <div class="info-box">
+      <div class="label">🔍 console.log() বিস্তারিত</div>
+      <ul class="list">
+        <li><span class="kw">console</span> — এটা <span class="kw">Browser</span>-এর একটা অংশের নাম। এটাকে ভাবো একটা নোটবুকের মতো।</li>
+        <li><span class="kw">.log()</span> — এটা একটা <span class="kw">Function</span> (কাজ করার নির্দেশ)। <span class="kw">log</span> মানে "লিখে রাখো"। তুমি যা লিখবে সেটা <span class="kw">Console</span>-এ দেখাবে।</li>
+        <li>ভেতরের <span class="kw">"..."</span> — দুটো উদ্ধৃতি চিহ্নের ভেতরে যা লিখবে সেটাই দেখাবে।</li>
+        <li><span class="kw">;</span> (semicolon) — প্রতিটা নির্দেশের শেষে এটা দেওয়া হয়। বাংলায় যেভাবে বাক্যের শেষে দাঁড়ি (।) দাও, এটা তেমনই।</li>
+      </ul>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ১</span>
+        <span class="example-title">নিজের নাম দিয়ে চেষ্টা করো</span>
+      </div>
+      <div class="example-body">
+        এবার Console-এ এটা টাইপ করো (তোমার নাম দিয়ে):
+        <div class="code-block">
+          <div class="code-top">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-lang">JavaScript</span>
+          </div>
+          <pre><span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-string">"আমার নাম রাফি।"</span><span class="c-punc">);</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-string">"আমি JS শিখছি!"</span><span class="c-punc">);</span></pre>
+        </div>
+        <div class="output-box">
+          <div class="out-label">Output</div>
+          আমার নাম রাফি।<br>
+          আমি JS শিখছি!
+        </div>
+        দেখলে? দুটো আলাদা <span class="kw">console.log()</span> দিলে দুটো আলাদা লাইনে দেখায়!
+      </div>
+    </div>
+
+    <div class="example-block">
+      <div class="example-header">
+        <span class="example-label">উদাহরণ ২</span>
+        <span class="example-title">সংখ্যা দিয়েও কাজ করে!</span>
+      </div>
+      <div class="example-body">
+        শুধু লেখা না, সংখ্যাও দেখাতে পারো — এমনকি হিসাবও করতে পারো:
+        <div class="code-block">
+          <div class="code-top">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-lang">JavaScript</span>
+          </div>
+          <pre><span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-num">5</span> <span class="c-punc">+</span> <span class="c-num">3</span><span class="c-punc">);</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-num">10</span> <span class="c-punc">*</span> <span class="c-num">4</span><span class="c-punc">);</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-num">100</span> <span class="c-punc">-</span> <span class="c-num">37</span><span class="c-punc">);</span></pre>
+        </div>
+        <div class="output-box">
+          <div class="out-label">Output</div>
+          8<br>
+          40<br>
+          63
+        </div>
+        <span class="kw">JavaScript</span> একটা Calculator-ও বটে! <span class="kw">+</span> মানে যোগ, <span class="kw">*</span> মানে গুণ, <span class="kw">-</span> মানে বিয়োগ।
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Today's Summary -->
+  <div class="section">
+    <div class="section-title">
+      <div class="section-num">📌</div>
+      <h2>আজকে কী শিখলাম — <span>Summary</span></h2>
+    </div>
+
+    <div class="info-box">
+      <div class="label">✅ Class 1 Summary</div>
+      <ul class="list">
+        <li><span class="kw">Computer</span> হলো একটা যন্ত্র যেটা নির্দেশ মেনে কাজ করে।</li>
+        <li><span class="kw">Internet</span> হলো লক্ষ কোটি Computer-এর সংযুক্ত নেটওয়ার্ক।</li>
+        <li><span class="kw">Web Browser</span> হলো Internet-এ ঘোরার সফটওয়্যার (Chrome, Firefox ইত্যাদি)।</li>
+        <li><span class="kw">Website</span> হলো Internet-এ থাকা পাতা, যেটা Server-এ সংরক্ষিত থাকে।</li>
+        <li><span class="kw">Programming Language</span> হলো Computer-কে নির্দেশ দেওয়ার ভাষা।</li>
+        <li><span class="kw">JavaScript</span> হলো একটি Programming Language যেটা Browser-এই চলে এবং Website-কে জীবন্ত করে।</li>
+        <li><span class="kw">console.log()</span> দিয়ে কিছু লেখা বা সংখ্যা Console-এ দেখানো যায়।</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Test Section -->
+  <div class="test-section">
+    <div class="test-header">
+      <span class="test-icon">📝</span>
+      <h2>
+        Class 1 — Test
+        <small>এই প্রশ্নগুলোর উত্তর লিখে তোমার ভাইকে দেখাও</small>
+      </h2>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ১ / ১০</div>
+      <p><strong>Computer</strong> কী? নিজের ভাষায় ১-২ বাক্যে বলো।</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ২ / ১০</div>
+      <p><strong>Internet</strong> আর <strong>Web Browser</strong>-এর মধ্যে পার্থক্য কী?</p>
+      <p class="sub">힌트: একটা রাস্তার মতো, আরেকটা তোমার গাড়ির মতো।</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৩ / ১০</div>
+      <p>তুমি যে <strong>Web Browser</strong> ব্যবহার করো সেটার নাম কী? আর আরো ২টা Browser-এর নাম বলো।</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৪ / ১০</div>
+      <p><strong>Website</strong> কোথায় সংরক্ষিত থাকে? এবং প্রতিটা Website-এর নিজস্ব ঠিকানাকে কী বলে?</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৫ / ১০</div>
+      <p>একটা Website তৈরিতে ৩টি প্রধান জিনিস লাগে — কী কী? এবং <strong>JavaScript</strong>-এর কাজ কী?</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৬ / ১০</div>
+      <p><strong>Programming Language</strong> কী কাজে লাগে? <strong>JavaScript</strong> আর <strong>Java</strong> কি একই? কেন?</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৭ / ১০</div>
+      <p><strong>console.log()</strong>-এর কাজ কী? <strong>semicolon (;)</strong> কেন দিতে হয়?</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৮ / ১০</div>
+      <p>Browser-এর <strong>Console</strong> কীভাবে খুলতে হয়?</p>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ৯ / ১০ — হাতে-কলমে</div>
+      <p>Console খুলে এই Code লিখে চালাও এবং Output কী আসে সেটা বলো:</p>
+      <div class="code-block" style="margin-top:10px">
+        <div class="code-top">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">চালাও এবং Output বলো</span>
+        </div>
+        <pre><span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-num">25</span> <span class="c-punc">+</span> <span class="c-num">75</span><span class="c-punc">);</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-num">8</span> <span class="c-punc">*</span> <span class="c-num">9</span><span class="c-punc">);</span>
+<span class="c-func">console</span><span class="c-punc">.</span><span class="c-func">log</span><span class="c-punc">(</span><span class="c-string">"আমার বয়স ১৫"</span><span class="c-punc">);</span></pre>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-num">প্রশ্ন ১০ / ১০ — সৃজনশীল</div>
+      <p>Console-এ নিজে একটা Code লেখো যেটা তিনটা জিনিস দেখাবে:</p>
+      <ul class="list" style="margin-top:8px">
+        <li>তোমার নাম</li>
+        <li>তোমার পছন্দের খেলা বা কাজ</li>
+        <li>৩৫ আর ৬৫ যোগ করলে কত হয়</li>
+      </ul>
+      <p class="sub">হিন্ট: তিনটা console.log() লিখতে হবে!</p>
+    </div>
+
+  </div>
+
+  <!-- Completion Banner -->
+  <div class="complete-banner">
+    <h3>🎉 Class 1 শেষ! অনেক ভালো করেছ!</h3>
+    <p>
+      Test-এর উত্তর করে তোমার ভাইকে দেখাও। সব ঠিক থাকলে Class 2-তে আমরা শিখব
+      <span class="kw">Variable</span>, <span class="kw">Data Type</span> এবং আরো মজার জিনিস!
+    </p>
+  </div>
+
+</div>
+</body>
+</html>
