@@ -1,209 +1,450 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<title>Python Learn - Calculator</title>
-<style>
-  html,body{margin:0;height:100%;font-family:Consolas,monospace;background:#1e1e1e;}
-  #app{display:flex;flex-direction:column;height:100vh;}
-  #codePane{flex:1;background:#1e1e1e;color:#d4d4d4;padding:20px;overflow:auto;
-    white-space:pre;font-size:15px;line-height:1.5;border-bottom:3px solid #333;}
-  #termPane{flex:1;background:#0c0c0c;display:flex;flex-direction:column;}
-  #toolbar{padding:8px 15px;background:#252526;display:flex;gap:10px;}
-  button{padding:6px 18px;font-size:14px;border:none;border-radius:4px;cursor:pointer;}
-  #runBtn{background:#2ea043;color:#fff;}
-  #stopBtn{background:#da3633;color:#fff;}
-  #output{flex:1;padding:15px;overflow-y:auto;color:#0f0;font-size:15px;}
-  .line{white-space:pre-wrap;margin:2px 0;}
-  .inputLine{display:flex;}
-  .inputLine input{background:transparent;border:none;color:#0f0;font-family:inherit;
-    font-size:inherit;flex:1;outline:none;}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Read the Code</title>
+<style id="ds">
+/* =====================================================================
+   DESIGN SYSTEM. The only place a visual value is allowed to live.
+   This exact sheet is also injected into every lesson iframe.
+
+   COLOR RULES (do not add colors):
+   1. Everything (page, panels, buttons, borders) is GRAY or WHITE.
+   2. TEXT is the only thing that is BLACK.
+   3. --blue is the ONLY extra color. Use it inside lessons for graphics
+      that explain something (boxes, arrows, icons, code keywords).
+   4. --mark is the highlighter: it marks the code lines to look at.
+   ===================================================================== */
+:root{
+  --bg:#ececee; --surface:#ffffff; --edge:#d6d6dc; --press:#e0e0e5; --text:#111111;
+  --blue:#2f6df6; --blue-soft:#dce6ff; --mark:#fff0a3;
+  --syn-key:var(--blue); --syn-fn:var(--blue); --syn-str:var(--text); --syn-num:var(--text); --syn-com:#75757f;
+
+  /* SPACE: one responsive unit, everything is a multiple of it */
+  --u:clamp(.5rem,2.2vmin,1.25rem);
+  --gap:var(--u);              /* row to row, column to column */
+  --pad:calc(var(--u)*2);      /* window edge and split divider to content */
+  --radius:var(--u);
+  --line:max(1px,.08rem);
+
+  /* LAYOUT */
+  --split-top:minmax(0,1fr); --split-bottom:minmax(0,1fr);
+  --slots:4;                   /* fixed number of buttons in an mcq */
+
+  /* TYPE */
+  --font-ui:system-ui,"Noto Sans Bengali","Hind Siliguri",sans-serif;
+  --font-code:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --fs-0:clamp(.8rem,1.4vmin + .5rem,.95rem);
+  --fs-1:clamp(.95rem,1.8vmin + .5rem,1.2rem);
+  --fs-2:clamp(1rem,2.4vmin + .5rem,1.5rem);
+  --fs-3:clamp(1.2rem,3vmin + .6rem,2rem);
+
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141416; --surface:#1d1d20; --edge:#3a3a41; --press:#2b2b30; --text:#f1f1f3;
+  --blue:#7aa2ff; --blue-soft:#22315a; --mark:#4d4300; --syn-com:#9a9aa5;
+}}
+:root[data-theme="dark"]{
+  --bg:#141416; --surface:#1d1d20; --edge:#3a3a41; --press:#2b2b30; --text:#f1f1f3;
+  --blue:#7aa2ff; --blue-soft:#22315a; --mark:#4d4300; --syn-com:#9a9aa5;
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--text);font:var(--fs-1)/1.6 var(--font-ui)}
+
+/* SHELL: top = lesson iframe, bottom = deck of buttons */
+.shell{height:100%;display:grid;grid-template-rows:var(--split-top) var(--split-bottom)}
+.stage{display:block;width:100%;height:100%;border:0;background:var(--surface)}
+.deck{display:grid;gap:var(--gap);padding:var(--pad);border-top:var(--line) solid var(--edge);background:var(--bg);overflow:auto;min-height:0}
+.shell[data-col="true"] .deck{grid-template-columns:repeat(var(--slots),minmax(0,1fr))}
+.shell[data-col="false"] .deck{grid-template-rows:repeat(var(--slots),minmax(min-content,1fr))}
+.shell[data-col="false"] .btn:only-child{grid-row:var(--slots)}
+.btn{display:flex;align-items:center;justify-content:center;min-width:0;padding:var(--gap);font:inherit;font-size:var(--fs-2);text-align:center;overflow-wrap:anywhere;
+  color:var(--text);background:var(--surface);border:var(--line) solid var(--edge);border-radius:var(--radius);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn:active{background:var(--press)}
+@media (hover:hover){.btn:hover{background:var(--press)}}
+.btn:focus-visible{outline:var(--line) solid var(--text);outline-offset:var(--line)}
+
+/* LESSON KIT: classes lesson html can use */
+.lesson{height:auto;min-height:100%;padding:var(--pad);background:var(--surface)}
+.lesson>*{margin:0}
+.lesson>*+*{margin-top:var(--gap)}
+.q{font-size:var(--fs-3);font-weight:650;line-height:1.35}
+.note{font-size:var(--fs-1)}
+code{font-family:var(--font-code);background:var(--bg);border-radius:calc(var(--u)/2);padding:0 calc(var(--u)/2)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--gap)}
+.row>.code{flex:1 1 0;min-width:0}
+.center{min-height:calc(100vh - var(--pad)*2);display:flex;flex-direction:column;justify-content:center;gap:var(--gap)}
+.center>*{margin:0}
+.fail{display:flex;align-items:center;gap:var(--pad)}
+.g{display:block;flex:none;width:auto;height:calc(var(--u)*6);color:var(--blue)}
+.var{display:inline-flex;flex-direction:column;text-align:center;font-family:var(--font-code);border:var(--line) solid var(--blue);border-radius:var(--radius);overflow:hidden}
+.var b{padding:calc(var(--u)/2) var(--gap);background:var(--blue-soft);font-weight:600}
+.var span{padding:calc(var(--u)/2) var(--gap);background:var(--surface)}
+
+/* CODE BLOCK (highlighted by the injected highlighter) */
+pre.code{margin:0;padding:var(--gap) 0;overflow:auto;counter-reset:ln;background:var(--bg);border:var(--line) solid var(--edge);border-radius:var(--radius);font:var(--fs-1)/1.6 var(--font-code);color:var(--text)}
+.code .ln{display:block;min-height:1.6em;padding:0 var(--gap);white-space:pre;counter-increment:ln}
+.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-right:var(--gap);text-align:right;color:var(--syn-com)}
+.code .mark{background:var(--mark)}
+.code i{font-style:normal}
+.t-k{color:var(--syn-key);font-weight:700}.t-f{color:var(--syn-fn)}.t-n{color:var(--syn-num);font-weight:700}
+.code i.t-s{color:var(--syn-str);font-style:italic}.t-c{color:var(--syn-com)}
 </style>
 </head>
 <body>
-<div id="app">
+<main class="shell" id="app" data-kind="learn" data-col="false">
+  <iframe class="stage" id="stage" sandbox="allow-scripts" title="lesson"></iframe>
+  <div class="deck" id="deck" role="group"></div>
+</main>
 
-  <div id="codePane"># Simple Calculator - Learn Python Basics
+<!--
+LESSONS JSON. One object per lesson. Index 0 is always the first lesson.
+  state     "learn" (one Understood button) | "mcq" (exactly 4 option buttons)
+  html      string, or array of lines: loaded into the top iframe
+  next      index of the lesson to load after this one, or null = last lesson
+  end_html  only when next is null: the end page shown in the iframe
+  mcq only:
+    is_column  true = 4 columns, false = 4 rows
+    options    exactly 4 strings
+    answer     index 0-3 of the right option
+    wrong      html shown when a wrong option is picked. A string/array = same for all,
+               or an object {"1": html, "*": html} = per option index, "*" = the rest.
+               After it, Understood returns to the same question.
+If anything breaks (bad JSON, bad index, error inside a lesson) the server error page is shown.
+-->
+<script type="application/json" id="lessons">
 
-def calculator():
-    print("=== Simple Calculator ===")
-    running = True
+</script>
+[
+{"state":"learn","next":1,
+ "html":[
+  "<p class='q'>কোড মানে কী?</p>",
+  "<p class='note'>কোড হলো <b>কম্পিউটারকে দেওয়া নির্দেশ</b>। তুমি লিখবে, কম্পিউটার সেটা করবে।</p>",
+  "<p class='note'>ঠিক যেমন তুমি বলো \"ভাত দাও\" — কম্পিউটারকে বলতে হয় কোডে।</p>",
+  "<p class='note'>আজ শিখবে: কম্পিউটারকে কীভাবে কিছু <b>দেখাতে</b> বলো, কীভাবে কিছু <b>মনে রাখতে</b> বলো।</p>"]},
 
-    while running:
-        print("1. Add")
-        print("2. Subtract")
-        print("3. Multiply")
-        print("4. Divide")
-        print("5. Exit")
+{"state":"learn","next":2,
+ "html":[
+  "<p class='q'>print() — স্ক্রিনে দেখাও</p>",
+  "<pre class='code' data-hl='1'>print(\"Hello\")</pre>",
+  "<p class='note'><code>print</code> মানে: <b>স্ক্রিনে দেখাও</b>।</p>",
+  "<p class='note'>ভেতরে যা লিখবে, সেটা স্ক্রিনে আসবে। এখানে আসবে: <code>Hello</code></p>",
+  "<p class='note'>⚠️ quotes (<code>\"\"</code>) ভেতরে লেখাটা রাখতে হয়। কেন? সেটা একটু পরে শিখবে।</p>"]},
 
-        choice = input("Choose an option (1-5): ")
+{"state":"mcq","is_column":true,"next":3,"answer":1,
+ "html":[
+  "<p class='q'>এই কোড রান করলে কী হবে?</p>",
+  "<pre class='code' data-hl='1'>print(\"Mahi\")</pre>"],
+ "options":["কিছু হবে না","স্ক্রিনে Mahi আসবে","Error আসবে","print লেখা আসবে"],
+ "wrong":{
+  "0":["<p class='q'>না, কিছু একটা হবে!</p>","<pre class='code' data-hl='1'>print(\"Mahi\")</pre>","<p class='note'><code>print</code> একটা হুকুম — সে ভেতরের জিনিস স্ক্রিনে <b>দেখায়</b>।</p>"],
+  "2":["<p class='q'>না, Error নেই</p>","<pre class='code' data-hl='1'>print(\"Mahi\")</pre>","<p class='note'>কোডটা সঠিক। <code>print</code> ঠিকমতো লেখা আছে, quotes আছে। সব ঠিক।</p>"],
+  "*":["<p class='q'>না, print নিজে আসে না</p>","<pre class='code' data-hl='1'>print(\"Mahi\")</pre>","<p class='note'><code>print</code> একটা <b>হুকুম</b>। সে নিজে স্ক্রিনে আসে না — শুধু ভেতরের জিনিস দেখায়।</p>"]}},
 
-        if choice == "5":
-            print("Goodbye!")
-            running = False
-        elif choice in ("1", "2", "3", "4"):
-            num1 = float(input("Enter first number: "))
-            num2 = float(input("Enter second number: "))
+{"state":"learn","next":4,
+ "html":[
+  "<p class='q'>Variable = একটা নামওয়ালা বাক্স</p>",
+  "<div class='row'><pre class='code' data-hl='1'>name = \"Mahi\"</pre><div class='var'><b>name</b><span>Mahi</span></div></div>",
+  "<p class='note'>Variable মানে একটা <b>নামওয়ালা বাক্স</b>। তুমি কিছু রাখতে পারো ভেতরে।</p>",
+  "<p class='note'><code>=</code> মানে \"সমান\" না। মানে <b>রাখো</b>।<br><code>name = \"Mahi\"</code> → name বাক্সে \"Mahi\" রাখো।</p>"]},
 
-            if choice == "1":
-                result = num1 + num2
-                print(f"Result: {num1} + {num2} = {result}")
-            elif choice == "2":
-                result = num1 - num2
-                print(f"Result: {num1} - {num2} = {result}")
-            elif choice == "3":
-                result = num1 * num2
-                print(f"Result: {num1} * {num2} = {result}")
-            elif choice == "4":
-                if num2 == 0:
-                    print("Error: Cannot divide by zero!")
-                else:
-                    result = num1 / num2
-                    print(f"Result: {num1} / {num2} = {result}")
-        else:
-            print("Invalid option, try again.")
+{"state":"mcq","is_column":false,"next":5,"answer":2,
+ "html":[
+  "<p class='q'>এই কোডে age কী?</p>",
+  "<pre class='code' data-hl='1'>age = 15</pre>"],
+ "options":["একটা সংখ্যা","একটা হুকুম","একটা variable (বাক্স)","একটা Error"],
+ "wrong":{
+  "0":["<p class='q'>না, 15 হলো সংখ্যা</p>","<pre class='code' data-hl='1'>age = 15</pre>","<p class='note'><code>age</code> হলো বাক্সের <b>নাম</b>। 15 হলো সেই বাক্সে রাখা জিনিস।</p>"],
+  "1":["<p class='q'>না, age হুকুম না</p>","<pre class='code' data-hl='1'>age = 15</pre>","<p class='note'><code>print</code> হলো হুকুম। <code>age</code> হলো একটা বাক্সের নাম যেখানে 15 রাখা হয়েছে।</p>"],
+  "*":["<p class='q'>না, Error নেই</p>","<pre class='code' data-hl='1'>age = 15</pre>","<p class='note'>কোডটা ঠিক আছে। <code>age</code> একটা variable — মানে নামওয়ালা বাক্স।</p>"]}},
 
-calculator()
-  </div>
+{"state":"learn","next":6,
+ "html":[
+  "<p class='q'>String মানে লেখা (text)</p>",
+  "<pre class='code' data-hl='1'>name = \"Mahi\"</pre>",
+  "<p class='note'><code>\"Mahi\"</code> হলো একটা <b>String</b>। String মানে <b>লেখা</b> বা <b>text</b>।</p>",
+  "<p class='note'>লেখা সবসময় <b>quotes (<code>\"\"</code>) এর ভেতরে</b> রাখতে হয়। এভাবে কম্পিউটার বোঝে: \"এটা লেখা\"।</p>",
+  "<p class='note'>Single quote (<code>''</code>) দিয়েও হয়: <code>name = 'Mahi'</code> — দুটো একই কাজ করে।</p>"]},
 
-  <div id="termPane">
-    <div id="toolbar">
-      <button id="runBtn">▶ Run</button>
-      <button id="stopBtn">■ Stop</button>
-    </div>
-    <div id="output"></div>
-  </div>
+{"state":"learn","next":7,
+ "html":[
+  "<p class='q'>⚠️ Quotes না দিলে কী হয়?</p>",
+  "<pre class='code' data-hl='1'>name = Mahi</pre>",
+  "<p class='note'>❌ এটা <b>Error</b> দেবে!</p>",
+  "<p class='note'>কারণ: quotes ছাড়া লিখলে কম্পিউটার ভাবে <code>Mahi</code> একটা <b>variable এর নাম</b> (বাক্সের নাম)। কিন্তু Mahi নামে কোনো বাক্স আগে তৈরি হয়নি!</p>",
+  "<pre class='code' data-hl='1'>name = \"Mahi\"</pre>",
+  "<p class='note'>✅ Quotes দিলে কম্পিউটার বোঝে: এটা <b>লেখা</b>, variable না। কোনো বাক্স খোঁজার দরকার নেই।</p>"]},
 
-</div>
+{"state":"mcq","is_column":false,"next":8,"answer":0,
+ "html":[
+  "<p class='q'>কোনটা সঠিক?</p>",
+  "<p class='note'>একটা variable-এ \"Rafi\" নাম রাখতে চাই।</p>"],
+ "options":["name = \"Rafi\"","name = Rafi","\"name\" = Rafi","name = 'Rafi"],
+ "wrong":{
+  "1":["<p class='q'>না, quotes ছাড়া Error!</p>","<pre class='code' data-hl='1'>name = Rafi</pre>","<p class='note'>Quotes ছাড়া কম্পিউটার ভাবে <code>Rafi</code> একটা variable নাম। কিন্তু Rafi নামে কোনো variable নেই — তাই Error!</p>"],
+  "2":["<p class='q'>না, variable নামে quotes দিতে নেই</p>","<pre class='code' data-hl='1'>\"name\" = Rafi</pre>","<p class='note'>Variable নাম (বাক্সের নাম) <b>quotes ছাড়া</b> লিখতে হয়। Quotes শুধু <b>লেখা/text</b> এর জন্য।</p>"],
+  "*":["<p class='q'>না, quote শেষ হয়নি!</p>","<pre class='code' data-hl='1'>name = 'Rafi</pre>","<p class='note'>Quote শুরু করলে <b>শেষেও</b> quote দিতে হয়।<br>✅ <code>'Rafi'</code> অথবা <code>\"Rafi\"</code></p>"]}},
+
+{"state":"learn","next":9,
+ "html":[
+  "<p class='q'>Number — সংখ্যায় quotes লাগে না</p>",
+  "<pre class='code' data-hl='1,2'>age = 15\nprice = 100</pre>",
+  "<div class='row'><div class='var'><b>age</b><span>15</span></div><div class='var'><b>price</b><span>100</span></div></div>",
+  "<p class='note'>সংখ্যা লিখতে <b>quotes লাগে না</b>। শুধু সংখ্যাটা লেখো।</p>",
+  "<p class='note'><code>15</code> আর <code>100</code> হলো <b>Integer</b> (পুরো সংখ্যা, দশমিক নেই)।</p>"]},
+
+{"state":"mcq","is_column":true,"next":10,"answer":2,
+ "html":[
+  "<p class='q'>কোনটা সংখ্যা (Integer)?</p>"],
+ "options":["\"25\"","\"age\"","25","age"],
+ "wrong":{
+  "0":["<p class='q'>না, \"25\" হলো String!</p>","<p class='note'>Quotes থাকলে সেটা সবসময় <b>লেখা (String)</b>।<br><code>\"25\"</code> দেখতে সংখ্যা, কিন্তু কম্পিউটারের কাছে এটা text।</p>"],
+  "1":["<p class='q'>না, \"age\" একটা String</p>","<p class='note'>Quotes আছে, তাই এটা <b>লেখা</b>। সংখ্যা হলে quotes থাকবে না।</p>"],
+  "*":["<p class='q'>না, age একটা variable নাম</p>","<p class='note'><code>age</code> কোনো সংখ্যা না — এটা quotes ছাড়া একটা শব্দ, তাই Python এটাকে <b>variable</b> (বাক্স) মনে করে।</p>"]}},
+
+{"state":"learn","next":11,
+ "html":[
+  "<p class='q'>\"12\" আর 12 — কি একই জিনিস?</p>",
+  "<div class='row'><pre class='code' data-hl='1'>a = \"12\"</pre><div class='var'><b>a</b><span>\"12\" (লেখা)</span></div></div>",
+  "<div class='row'><pre class='code' data-hl='1'>b = 12</pre><div class='var'><b>b</b><span>12 (সংখ্যা)</span></div></div>",
+  "<p class='note'>❌ <b>একই না!</b></p>",
+  "<p class='note'><code>\"12\"</code> = লেখা (String)। কম্পিউটার একে দুটো অক্ষর \"1\" আর \"2\" হিসেবে দেখে।<br><code>12</code> = সংখ্যা (Integer)। এটা দিয়ে যোগ-বিয়োগ করা যায়।</p>"]},
+
+{"state":"mcq","is_column":true,"next":12,"answer":1,
+ "html":[
+  "<p class='q'>\"5\" + \"3\" এর ফলাফল কী?</p>",
+  "<pre class='code' data-hl='1,2'>result = \"5\" + \"3\"\nprint(result)</pre>",
+  "<p class='note'>মনে রাখো: quotes মানে লেখা (text)।</p>"],
+ "options":["8","53","Error","\"8\""],
+ "wrong":{
+  "0":["<p class='q'>না, 8 না!</p>","<p class='note'>\"5\" আর \"3\" হলো <b>লেখা</b>, সংখ্যা না।<br>লেখা + লেখা = <b>জোড়া লাগে</b>।<br>\"5\" + \"3\" = \"53\" → স্ক্রিনে আসে <code>53</code></p>"],
+  "2":["<p class='q'>না, Error হবে না</p>","<p class='note'>দুটো String যোগ করা যায়! কিন্তু সংখ্যার যোগ হয় না — <b>লেখা জোড়া লাগে</b>।</p>"],
+  "*":["<p class='q'>প্রায় ঠিক, কিন্তু...</p>","<p class='note'>print করলে quotes <b>স্ক্রিনে দেখা যায় না</b>। তাই output শুধু <code>53</code>, \"8\" না।</p>"]}},
+
+{"state":"learn","next":13,
+ "html":[
+  "<p class='q'>Float — দশমিক সংখ্যা</p>",
+  "<pre class='code' data-hl='1,2'>height = 5.6\nprice = 99.99</pre>",
+  "<div class='row'><div class='var'><b>height</b><span>5.6</span></div><div class='var'><b>price</b><span>99.99</span></div></div>",
+  "<p class='note'>দশমিক সংখ্যাকে বলে <b>Float</b>।</p>",
+  "<p class='note'><code>5.6</code> আর <code>99.99</code> হলো Float। Integer এর মতোই, কিন্তু পয়েন্ট (<code>.</code>) আছে।</p>"]},
+
+{"state":"mcq","is_column":true,"next":14,"answer":2,
+ "html":[
+  "<p class='q'>কোনটা Float?</p>"],
+ "options":["42","\"3.14\"","3.14","three"],
+ "wrong":{
+  "0":["<p class='q'>না, 42 একটা Integer</p>","<p class='note'>42 পুরো সংখ্যা, কোনো দশমিক নেই। Float এ <b>দশমিক পয়েন্ট (.)</b> থাকে।</p>"],
+  "1":["<p class='q'>না, \"3.14\" একটা String!</p>","<p class='note'>Quotes আছে মানে এটা <b>লেখা</b>! Float হতে হলে quotes ছাড়া লিখতে হবে: <code>3.14</code></p>"],
+  "*":["<p class='q'>না, three একটা variable নাম</p>","<p class='note'><code>three</code> quotes ছাড়া একটা শব্দ, তাই Python এটাকে variable নাম মনে করবে। সংখ্যা না।</p>"]}},
+
+{"state":"learn","next":15,
+ "html":[
+  "<p class='q'>Boolean — সত্য অথবা মিথ্যা</p>",
+  "<pre class='code' data-hl='1,2'>is_student = True\nis_tall = False</pre>",
+  "<div class='row'><div class='var'><b>is_student</b><span>True ✅</span></div><div class='var'><b>is_tall</b><span>False ❌</span></div></div>",
+  "<p class='note'>Boolean এর মাত্র <b>২টা</b> মান: <code>True</code> (সত্য) আর <code>False</code> (মিথ্যা)।</p>",
+  "<p class='note'>⚠️ T আর F <b>বড় হাতের</b> হতে হবে।<br><code>True</code> ✅ ঠিক<br><code>true</code> ❌ Error!</p>"]},
+
+{"state":"mcq","is_column":true,"next":16,"answer":3,
+ "html":[
+  "<p class='q'>কোনটা Boolean?</p>"],
+ "options":["\"True\"","true","1","False"],
+ "wrong":{
+  "0":["<p class='q'>না, \"True\" হলো String!</p>","<p class='note'>Quotes আছে, তাই এটা <b>লেখা</b>। Boolean <code>True</code> লিখতে হয় <b>quotes ছাড়া</b>।</p>"],
+  "1":["<p class='q'>না, ছোট হাতের true চলে না!</p>","<p class='note'>Python এ Boolean লিখতে হয় <b>বড় হাতের T</b> দিয়ে: <code>True</code>।<br>ছোট হাতের <code>true</code> লিখলে Python ভাবে এটা variable নাম — Error!</p>"],
+  "*":["<p class='q'>না, 1 একটা Integer</p>","<p class='note'><code>1</code> একটা সংখ্যা (Integer)।<br>Boolean হলো শুধু <code>True</code> অথবা <code>False</code>।</p>"]}},
+
+{"state":"learn","next":17,
+ "html":[
+  "<p class='q'>type() — জিনিসের ধরন জানো</p>",
+  "<pre class='code' data-hl='1,2,3,4'>print(type(\"Mahi\"))\nprint(type(15))\nprint(type(3.14))\nprint(type(True))</pre>",
+  "<p class='note'>Output:</p>",
+  "<pre class='code'>&lt;class 'str'&gt;\n&lt;class 'int'&gt;\n&lt;class 'float'&gt;\n&lt;class 'bool'&gt;</pre>",
+  "<p class='note'><code>str</code> = String (লেখা)<br><code>int</code> = Integer (পুরো সংখ্যা)<br><code>float</code> = Float (দশমিক সংখ্যা)<br><code>bool</code> = Boolean (সত্য/মিথ্যা)</p>",
+  "<p class='note'><code>type()</code> দিয়ে যেকোনো জিনিসের <b>ধরন</b> জানা যায়। ভুল ধরতে কাজে লাগে!</p>"]},
+
+{"state":"mcq","is_column":false,"next":18,"answer":0,
+ "html":[
+  "<p class='q'>type(\"100\") কী দেবে?</p>",
+  "<pre class='code' data-hl='1'>print(type(\"100\"))</pre>",
+  "<p class='note'>ভালো করে দেখো: quotes আছে কি নেই?</p>"],
+ "options":["str","int","float","bool"],
+ "wrong":{
+  "1":["<p class='q'>না, int না!</p>","<pre class='code' data-hl='1'>print(type(\"100\"))</pre>","<p class='note'>\"100\" দেখতে সংখ্যা, কিন্তু <b>quotes আছে</b>! Quotes মানে সবসময় String।</p>"],
+  "*":["<p class='q'>না, আবার দেখো</p>","<pre class='code' data-hl='1'>print(type(\"100\"))</pre>","<p class='note'><code>\"100\"</code> এর চারপাশে <b>quotes</b> আছে। Quotes মানে সবসময় <b>String (str)</b>।</p>"]}},
+
+{"state":"learn","next":19,
+ "html":[
+  "<p class='q'>Variable এর মান বদলানো যায়</p>",
+  "<pre class='code' data-hl='1,2,3'>x = 5\nx = 10\nprint(x)</pre>",
+  "<div class='row'><div class='var'><b>x (আগে)</b><span>5</span></div><svg class='g' viewBox='0 0 24 24'><path d='M5 12h14M13 6l6 6-6 6' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg><div class='var'><b>x (এখন)</b><span>10</span></div></div>",
+  "<p class='note'>প্রথমে x বাক্সে 5 ছিল। তারপর 10 রাখা হলো।</p>",
+  "<p class='note'><b>পুরনো মান মুছে যায়।</b> বাক্সে একসাথে একটাই জিনিস থাকে।<br>তাই <code>print(x)</code> দেখাবে <code>10</code>।</p>"]},
+
+{"state":"mcq","is_column":true,"next":20,"answer":1,
+ "html":[
+  "<p class='q'>কী print হবে?</p>",
+  "<pre class='code' data-hl='1,2,3'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>"],
+ "options":["Rafi","Mahi","Rafi Mahi","Error"],
+ "wrong":{
+  "0":["<p class='q'>না, Rafi মুছে গেছে!</p>","<pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>","<p class='note'>লাইন 2 তে name বাক্সে নতুন করে \"Mahi\" রাখা হয়েছে। পুরনো \"Rafi\" <b>মুছে গেছে</b>।</p>"],
+  "2":["<p class='q'>না, দুটো একসাথে আসে না</p>","<pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>","<p class='note'>Variable <b>একসাথে একটাই মান</b> রাখে। শেষেরটা থাকে, আগেরটা মুছে যায়।</p>"],
+  "*":["<p class='q'>না, Error নেই</p>","<pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>","<p class='note'>Variable এর মান বদলানো সম্পূর্ণ ঠিক। Python এ কোনো সমস্যা নেই।</p>"]}},
+
+{"state":"learn","next":21,
+ "html":[
+  "<p class='q'>Variable নামের নিয়ম</p>",
+  "<pre class='code' data-hl='1,2,3'>my_name = \"Mahi\"\nage2 = 15\n_score = 90</pre>",
+  "<p class='note'>✅ নামে <b>letter</b> (a-z, A-Z), <b>number</b> (0-9), আর <b>_</b> (underscore) থাকতে পারে।</p>",
+  "<pre class='code' data-hl='1,2'>2name = \"Mahi\"\nmy name = \"Mahi\"</pre>",
+  "<p class='note'>❌ নাম <b>number দিয়ে শুরু</b> হতে পারে না।<br>❌ নামে <b>space</b> (ফাঁকা জায়গা) থাকতে পারে না।<br>Space এর বদলে <code>_</code> ব্যবহার করো!</p>"]},
+
+{"state":"mcq","is_column":false,"next":22,"answer":1,
+ "html":[
+  "<p class='q'>কোন variable নামটা সঠিক?</p>"],
+ "options":["1st_name","first_name","first name","first-name"],
+ "wrong":{
+  "0":["<p class='q'>না, number দিয়ে শুরু!</p>","<p class='note'>Variable নাম <b>সংখ্যা দিয়ে শুরু</b> হতে পারে না।<br><code>1st_name</code> ❌ → <code>first_name</code> ✅</p>"],
+  "2":["<p class='q'>না, space আছে!</p>","<p class='note'>Variable নামে <b>space</b> থাকতে পারে না।<br>Space এর বদলে <code>_</code> ব্যবহার করো: <code>first_name</code></p>"],
+  "*":["<p class='q'>না, dash (-) চলে না!</p>","<p class='note'>Variable নামে <b>hyphen (-)</b> ব্যবহার করা যায় না।<br><code>_</code> (underscore) ব্যবহার করো: <code>first_name</code></p>"]}},
+
+{"state":"learn","next":23,
+ "html":[
+  "<p class='q'>print(name) vs print(\"name\")</p>",
+  "<pre class='code' data-hl='2'>name = \"Mahi\"\nprint(name)</pre>",
+  "<p class='note'>⚠️ <code>print(name)</code> — quotes নেই! তাই Python জানে <code>name</code> একটা <b>variable</b>।<br>Python বাক্স খুলে দেখে: name এ আছে \"Mahi\"।<br>তাই স্ক্রিনে আসে: <code>Mahi</code></p>",
+  "<pre class='code' data-hl='1'>print(\"name\")</pre>",
+  "<p class='note'>কিন্তু <code>print(\"name\")</code> লিখলে? Quotes আছে, তাই Python ভাবে এটা <b>লেখা</b>। কোনো বাক্স খোঁজে না।<br>স্ক্রিনে আসে: <code>name</code> (শব্দটা, বাক্সের মান না)</p>"]},
+
+{"state":"mcq","is_column":true,"next":24,"answer":0,
+ "html":[
+  "<p class='q'>কী print হবে?</p>",
+  "<pre class='code' data-hl='2'>city = \"Dhaka\"\nprint(\"city\")</pre>"],
+ "options":["city","Dhaka","\"city\"","Error"],
+ "wrong":{
+  "1":["<p class='q'>না, Dhaka না!</p>","<pre class='code' data-hl='2'>city = \"Dhaka\"\nprint(\"city\")</pre>","<p class='note'>Dhaka আসতে হলে লিখতে হতো <code>print(city)</code> — quotes <b>ছাড়া</b>।<br>কিন্তু এখানে <code>\"city\"</code> quotes <b>সহ</b> আছে, তাই এটা শুধু <b>লেখা</b>।</p>"],
+  "2":["<p class='q'>না, quotes স্ক্রিনে আসে না</p>","<p class='note'>print করলে quotes <b>স্ক্রিনে দেখা যায় না</b>। শুধু ভেতরের লেখা আসে।</p>"],
+  "*":["<p class='q'>না, Error নেই</p>","<p class='note'>কোডটা ঠিক আছে। <code>\"city\"</code> একটা String — সেটাই print হবে।</p>"]}},
+
+{"state":"learn","next":25,
+ "html":[
+  "<p class='q'>সবকিছু একসাথে — পুরো ছবি</p>",
+  "<pre class='code' data-hl='1,2,3,4'>name = \"Mahi\"       # str (লেখা)\nage = 13             # int (পুরো সংখ্যা)\nheight = 5.2         # float (দশমিক)\nis_student = True    # bool (সত্য/মিথ্যা)</pre>",
+  "<p class='note'>Python এ ৪ ধরনের basic data type:</p>",
+  "<p class='note'><b>str</b> → লেখা, quotes (<code>\"\"</code>) দিতে হয়<br><b>int</b> → পুরো সংখ্যা, quotes লাগে না<br><b>float</b> → দশমিক সংখ্যা, পয়েন্ট (<code>.</code>) আছে<br><b>bool</b> → শুধু <code>True</code> / <code>False</code></p>",
+  "<p class='note'>এবার কিছু টাস্ক দিয়ে দেখি তুমি কতটা শিখেছো! 💪</p>"]},
+
+{"state":"mcq","is_column":false,"next":26,"answer":2,
+ "html":[
+  "<p class='q'>🧪 টাস্ক ১: কী print হবে?</p>",
+  "<pre class='code' data-hl='1,2,3'>x = \"Hello\"\ny = \"World\"\nprint(x + y)</pre>"],
+ "options":["Hello World","x + y","HelloWorld","Error"],
+ "wrong":{
+  "0":["<p class='q'>প্রায় ঠিক, কিন্তু space নেই!</p>","<pre class='code' data-hl='3'>x = \"Hello\"\ny = \"World\"\nprint(x + y)</pre>","<p class='note'>String যোগ করলে <b>হুবহু জোড়া লাগে</b>। মাঝে আপনা থেকে space আসে না।<br>\"Hello\" + \"World\" = \"HelloWorld\"</p>"],
+  "1":["<p class='q'>না, x + y লেখা আসে না</p>","<p class='note'><code>x</code> আর <code>y</code> quotes ছাড়া, তাই এগুলো <b>variable</b>। Python বাক্স খুলে দেখবে কী আছে ভেতরে।</p>"],
+  "*":["<p class='q'>না, Error নেই</p>","<p class='note'>দুটো String যোগ করা যায়। \"Hello\" + \"World\" = \"HelloWorld\"</p>"]}},
+
+{"state":"mcq","is_column":false,"next":27,"answer":3,
+ "html":[
+  "<p class='q'>🧪 টাস্ক ২: কোনটা Error দেবে?</p>"],
+ "options":["name = \"Mahi\"","age = 15","is_happy = True","score = Mahi"],
+ "wrong":{
+  "0":["<p class='q'>না, এটা ঠিক আছে!</p>","<pre class='code' data-hl='1'>name = \"Mahi\"</pre>","<p class='note'>\"Mahi\" quotes এ আছে, তাই এটা String। ✅ সঠিক।</p>"],
+  "1":["<p class='q'>না, এটাও ঠিক!</p>","<pre class='code' data-hl='1'>age = 15</pre>","<p class='note'>15 একটা সংখ্যা (Integer), quotes ছাড়া। ✅ সঠিক।</p>"],
+  "*":["<p class='q'>না, এটা সঠিক!</p>","<pre class='code' data-hl='1'>is_happy = True</pre>","<p class='note'><code>True</code> একটা Boolean। বড় T দিয়ে লেখা। ✅ সঠিক।<br>কিন্তু <code>score = Mahi</code>? Mahi quotes ছাড়া — Python ভাবে এটা variable। কিন্তু Mahi নামে কোনো variable নেই! ❌</p>"]}},
+
+{"state":"mcq","is_column":true,"next":28,"answer":1,
+ "html":[
+  "<p class='q'>🧪 টাস্ক ৩: কী print হবে?</p>",
+  "<pre class='code' data-hl='1,2,3'>a = 10\na = 20\nprint(a)</pre>"],
+ "options":["10","20","10 20","Error"],
+ "wrong":{
+  "0":["<p class='q'>না, 10 মুছে গেছে!</p>","<pre class='code' data-hl='2'>a = 10\na = 20\nprint(a)</pre>","<p class='note'>লাইন 2 তে a বাক্সে <b>নতুন মান 20</b> রাখা হয়েছে। পুরনো 10 আর নেই।</p>"],
+  "2":["<p class='q'>না, দুটো একসাথে আসে না</p>","<p class='note'>Variable <b>একবারে একটাই মান</b> রাখে। শেষ যেটা রাখা হয়েছে সেটাই থাকে।</p>"],
+  "*":["<p class='q'>না, Error নেই</p>","<p class='note'>Variable এর মান বদলানো Python এ সম্পূর্ণ সঠিক।</p>"]}},
+
+{"state":"mcq","is_column":false,"next":null,"answer":0,
+ "html":[
+  "<p class='q'>🧪 শেষ টাস্ক: type(3.0) কী দেবে?</p>",
+  "<pre class='code' data-hl='1'>print(type(3.0))</pre>",
+  "<p class='note'>ভালো করে দেখো: পয়েন্ট (.) আছে কি নেই?</p>"],
+ "options":["float","int","str","bool"],
+ "wrong":{
+  "1":["<p class='q'>না, int না!</p>","<p class='note'><code>3.0</code> দেখতে পুরো সংখ্যা মনে হলেও <b>দশমিক পয়েন্ট (.)</b> আছে।<br>পয়েন্ট থাকলেই সেটা <b>float</b>!</p>"],
+  "2":["<p class='q'>না, str না!</p>","<p class='note'><code>3.0</code> তে <b>quotes নেই</b>। Quotes ছাড়া সংখ্যা হলে সেটা int অথবা float।</p>"],
+  "*":["<p class='q'>না, bool না!</p>","<p class='note'>Boolean শুধু <code>True</code> আর <code>False</code>।<br><code>3.0</code> একটা সংখ্যা — দশমিক পয়েন্ট আছে, তাই <b>float</b>।</p>"]},
+ "end_html":[
+  "<div class='center'>",
+  "<svg class='g' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12.5l3 3 5-6'/></svg>",
+  "<p class='q'>🎉 Class 1 শেষ!</p>",
+  "<p class='note'>তুমি এখন জানো:</p>",
+  "<p class='note'>✅ <code>print()</code> — স্ক্রিনে দেখাও<br>✅ Variable — নামওয়ালা বাক্স, <code>=</code> মানে রাখো<br>✅ <b>String (str)</b> — লেখা, quotes লাগে<br>✅ <b>Integer (int)</b> — পুরো সংখ্যা<br>✅ <b>Float (float)</b> — দশমিক সংখ্যা<br>✅ <b>Boolean (bool)</b> — True / False<br>✅ <code>type()</code> — ধরন দেখো<br>✅ Variable নামের নিয়ম<br>✅ <code>\"12\"</code> আর <code>12</code> এক না!</p>",
+  "<p class='note'>পরের Class এ শিখবে: <b>if/else</b> আর <b>input()</b> 🚀</p>",
+  "</div>"]}
+]
 
 <script>
-const output = document.getElementById('output');
-const termPane = document.getElementById('termPane');
-const runBtn = document.getElementById('runBtn');
-const stopBtn = document.getElementById('stopBtn');
+/* FRAMEWORK. Nothing visual here: every look comes from the design system above. */
+const $=id=>document.getElementById(id),root=document.documentElement,app=$('app'),deck=$('deck'),stage=$('stage');
+const DS=$('ds').textContent,SLOTS=+getComputedStyle(root).getPropertyValue('--slots');
+const ICON="<svg class='g' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3 2 20h20L12 3z'/><path d='M12 10v5M12 18v.01'/></svg>";
+const S={ok:'Understood',again:'Start again',
+  wrong:"<p class='q'>Not quite. Look again.</p>",
+  end:"<div class='center'><p class='q'>Lesson complete</p></div>",
+  fail:`<div class='center'><div class='fail'>${ICON}<div><p class='q'>Server error</p><p class='note'>Something went wrong. Please try again.</p></div></div></div>`};
+let LESSONS=[];
 
-let session = 0;
-let activeReject = null;
-
-class StopError extends Error {}
-
-function print(text = "") {
-  const div = document.createElement('div');
-  div.className = 'line';
-  div.textContent = text;
-  output.appendChild(div);
-  termPane.scrollTop = termPane.scrollHeight;
-}
-
-function input(promptText = "") {
-  return new Promise((resolve, reject) => {
-    const mySession = session;
-    const line = document.createElement('div');
-    line.className = 'line inputLine';
-
-    const promptSpan = document.createElement('span');
-    promptSpan.textContent = promptText;
-
-    const field = document.createElement('input');
-    field.autofocus = true;
-
-    line.appendChild(promptSpan);
-    line.appendChild(field);
-    output.appendChild(line);
-    field.focus();
-    termPane.scrollTop = termPane.scrollHeight;
-
-    activeReject = (err) => {
-      field.disabled = true;
-      reject(err);
-    };
-
-    field.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        if (session !== mySession) return;
-        const val = field.value;
-        field.disabled = true;
-        line.removeChild(field);
-        const valSpan = document.createElement('span');
-        valSpan.textContent = val;
-        line.appendChild(valSpan);
-        activeReject = null;
-        resolve(val);
-      }
-    });
+/* runs INSIDE every lesson iframe: reports errors, highlights <pre class="code"> */
+function boot(){
+  addEventListener('error',()=>parent.postMessage('lesson-error','*'));
+  const K=/^(and|as|break|class|continue|def|elif|else|for|from|if|import|in|is|not|or|pass|return|while|True|False|None)$/,
+    B=/^(print|input|len|range|int|str|float|list|type|min|max|sum|abs|round)$/,
+    esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])),
+    tok=s=>s.replace(/("[^"]*"|'[^']*')|(#.*)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)|([&<>])/g,(m,q,c,n,w,x)=>
+      q?`<i class="t-s">${esc(q)}</i>`:c?`<i class="t-c">${esc(c)}</i>`:n?`<i class="t-n">${n}</i>`:
+      w?(K.test(w)?`<i class="t-k">${w}</i>`:B.test(w)?`<i class="t-f">${w}</i>`:w):esc(x));
+  document.querySelectorAll('pre.code').forEach(p=>{
+    const hl=(p.dataset.hl||'').split(',').map(Number);
+    p.innerHTML=p.textContent.replace(/^\n|\n$/g,'').split('\n').map((l,i)=>`<span class="ln${hl.includes(i+1)?' mark':''}">${tok(l)}</span>`).join('');
   });
 }
+const lines=h=>[].concat(h??'').join('\n');
+const page=h=>`<!doctype html><html data-theme="${root.dataset.theme||''}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${DS}</style></head><body class="lesson">${lines(h)}<script>(${boot})()<\/script></body></html>`;
 
-// ==== This is the JS "engine" running behind the Python shown above ====
-async function calculator() {
-  print("=== Simple Calculator ===");
-  let running = true;
-
-  while (running) {
-    print("1. Add");
-    print("2. Subtract");
-    print("3. Multiply");
-    print("4. Divide");
-    print("5. Exit");
-
-    let choice = await input("Choose an option (1-5): ");
-
-    if (choice === "5") {
-      print("Goodbye!");
-      running = false;
-    } else if (["1", "2", "3", "4"].includes(choice)) {
-      let num1 = parseFloat(await input("Enter first number: "));
-      let num2 = parseFloat(await input("Enter second number: "));
-
-      if (choice === "1") {
-        let result = num1 + num2;
-        print(`Result: ${num1} + ${num2} = ${result}`);
-      } else if (choice === "2") {
-        let result = num1 - num2;
-        print(`Result: ${num1} - ${num2} = ${result}`);
-      } else if (choice === "3") {
-        let result = num1 * num2;
-        print(`Result: ${num1} * ${num2} = ${result}`);
-      } else if (choice === "4") {
-        if (num2 === 0) {
-          print("Error: Cannot divide by zero!");
-        } else {
-          let result = num1 / num2;
-          print(`Result: ${num1} / ${num2} = ${result}`);
-        }
-      }
-    } else {
-      print("Invalid option, try again.");
-    }
-  }
+/* one renderer for every screen: view = {kind, col, html, btns:[{t, run}]} */
+function show(v){
+  app.dataset.kind=v.kind; app.dataset.col=!!v.col;
+  deck.replaceChildren(...v.btns.map(b=>Object.assign(document.createElement('button'),{className:'btn',type:'button',textContent:b.t,onclick:b.run})));
+  stage.srcdoc=page(v.html);
 }
+const learnView=(html,run,kind='learn')=>({kind,col:false,html,btns:[{t:S.ok,run}]});
+const restart=html=>({kind:'learn',col:false,html,btns:[{t:S.again,run:()=>load(0)}]});
+const after=L=>L.next==null?show(restart(L.end_html??S.end)):load(L.next);
+const wrongOf=(w,k)=>w&&typeof w=='object'&&!Array.isArray(w)?(w[k]??w['*']):w;
 
-async function runProgram() {
-  session++;
-  output.innerHTML = '';
-  runBtn.disabled = true;
-  try {
-    await calculator();
-  } catch (e) {
-    if (!(e instanceof StopError)) {
-      print("Error: " + e.message);
-    }
-  } finally {
-    runBtn.disabled = false;
+/* the two states */
+const STATES={
+  learn:(L)=>learnView(L.html,()=>after(L)),
+  mcq:(L,i)=>{
+    if(!Array.isArray(L.options)||L.options.length!==SLOTS||!Number.isInteger(L.answer)||L.answer<0||L.answer>=SLOTS)throw new Error('mcq needs '+SLOTS+' options and a valid answer');
+    return{kind:'mcq',col:!!L.is_column,html:L.html,btns:L.options.map((t,k)=>({t,run:()=>k===L.answer?after(L):show(learnView(wrongOf(L.wrong,k)??S.wrong,()=>load(i)))}))};
   }
+};
+function load(i){
+  try{const L=LESSONS[i];if(!L||!Object.hasOwn(STATES,L.state))throw new Error('bad lesson index '+i);show(STATES[L.state](L,i))}
+  catch(e){fail(e)}
 }
+function fail(e){console.error(e);show({...restart(S.fail),kind:'fail'})}
 
-function stopProgram() {
-  session++;
-  if (activeReject) {
-    activeReject(new StopError("Stopped"));
-    activeReject = null;
-  }
-  output.innerHTML = '';
-}
-
-runBtn.addEventListener('click', runProgram);
-stopBtn.addEventListener('click', stopProgram);
+addEventListener('message',e=>{if(e.source===stage.contentWindow&&e.data==='lesson-error'&&app.dataset.kind!=='fail')fail('error inside lesson html')});
+try{LESSONS=JSON.parse($('lessons').textContent);load(0)}catch(e){fail(e)}
 </script>
 </body>
 </html>
+
+/* Now my this is my framework to learn my brother python he is complte biginer so this is hard for him like now I want a meaing full class like in first class clear the veriable and data type alll clear sequestially and in the last give a task hat ensures he get it by in the quest giving taks and in the option give the posisble answer to pik so only give th json to swap in the coe as ts the reason to build the framework a huge indetiaeld buildin like form name = "mahi" to why not name = mahi all in build up every complex thgins we rely on him to understand we must have understood him first before just giv eme the json script tag. */
