@@ -1,154 +1,341 @@
-/* CLASS 12 PHYSICS, CHAPTER 2: MOTION (1 axis, then 2 axes)
-   sim() = animated lesson. Slider scrubs time, Pause stops it.
-   cue = [time, spoken text, formula shown (stays on screen), code line to highlight] */
+window.LESSONS = [
+  {
+    "state": "learn", "next": 1,
+    "html": [
+      "<p class='q'>কোড মানে কী?</p>",
+      "<p class='note'>কোড হলো <b>কম্পিউটারকে দেওয়া নির্দেশ</b>। তুমি লিখবে, কম্পিউটার সেটা করবে।</p>",
+      "<p class='note'>ঠিক যেমন তুমি বলো \"ভাত দাও\" — কম্পিউটারকে বলতে হয় কোডে।</p>",
+      "<p class='note'>আজ শিখবে: কম্পিউটারকে কীভাবে কিছু <b>দেখাতে</b> বলো, কীভাবে কিছু <b>মনে রাখতে</b> বলো।</p>"]
+  },
 
-/* runs INSIDE the lesson iframe */
-function rt(cfg, draw) {
-  const st = getComputedStyle(document.documentElement), v = n => st.getPropertyValue(n).trim();
-  const C = { b: v('--blue'), s: v('--blue-soft'), t: v('--text'), e: v('--edge'), g: v('--syn-com') };
-  C.L = (x, a, b, c, d, col, w) => { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); x.moveTo(a, b); x.lineTo(c, d); x.stroke() };
-  C.D = (x, a, b, r, col) => { x.fillStyle = col; x.beginPath(); x.arc(a, b, r, 0, 7); x.fill() };
-  C.T = (x, s, a, b, col, al = 'center') => { x.fillStyle = col; x.font = '16px system-ui'; x.textAlign = al; x.fillText(s, a, b) };
-  addEventListener('DOMContentLoaded', () => {
-    const $ = s => document.querySelector(s), cv = $('canvas'), x = cv.getContext('2d'), sl = $('input'), pb = $('#pp'),
-      say = $('#say'), eq = $('#eq'), ln = [...document.querySelectorAll('.ln')];
-    let t = 0, play = true, last = 0, W, H;
-    function render() {
-      x.clearRect(0, 0, W, H); draw(x, t, W, H, C);
-      let cur = -1; cfg.cues.forEach((c, i) => { if (c[0] <= t) cur = i });
-      say.textContent = cur < 0 ? '' : cfg.cues[cur][1];
-      eq.innerHTML = cfg.cues.slice(0, cur + 1).filter(c => c[2]).map((c, i, a) => `<div class="note"><code>${i == a.length - 1 ? '<b>' + c[2] + '</b>' : c[2]}</code></div>`).join('');
-      ln.forEach((l, i) => l.classList.toggle('mark', cur >= 0 && cfg.cues[cur][3] === i + 1));
-      sl.value = t / cfg.T * 1000; pb.textContent = play ? 'Pause' : t >= cfg.T ? 'Replay' : 'Play';
+  {
+    "state": "learn", "next": 2,
+    "html": [
+      "<p class='q'>print() — স্ক্রিনে দেখাও</p>",
+      "   <pre class='code' data-hl='1'>print(\"Hello\")</pre>",
+      "<p class='note'><code>print</code> মানে: <b>স্ক্রিনে দেখাও</b>।</p>",
+      "<p class='note'>ভেতরে যা লিখবে, সেটা স্ক্রিনে আসবে। এখানে আসবে: <code>Hello</code></p>",
+      "<p class='note'>⚠️ quotes (<code>\"\"</code>) ভেতরে লেখাটা রাখতে হয়। কেন? সেটা একটু পরে শিখবে।</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 3, "answer": 1,
+    "html": [
+      "<p class='q'>এই কোড রান করলে কী হবে?</p>",
+      "   <pre class='code' data-hl='1'>print(\"Mahi\")</pre>"],
+    "options": ["কিছু হবে না", "স্ক্রিনে Mahi আসবে", "Error আসবে", "print লেখা আসবে"],
+    "wrong": {
+      "0": ["<p class='q'>না, কিছু একটা হবে!</p>", "   <pre class='code' data-hl='1'>print(\"Mahi\")</pre>", "<p class='note'><code>print</code> একটা হুকুম — সে ভেতরের জিনিস     স্ক্রিনে <b>দেখায়</b>।</p>"],
+      "2": ["<p class='q'>না, Error নেই</p>", "   <pre class='code' data-hl='1'>print(\"Mahi\")</pre>", "<p class='note'>কোডটা সঠিক। <code>print</code> ঠিকমতো লেখা আছে,     quotes আছে। সব ঠিক।</p>"],
+      "*": ["<p class='q'>না, print নিজে আসে না</p>", "   <pre class='code' data-hl='1'>print(\"Mahi\")</pre>", "<p class='note'><code>print</code> একটা <b>হুকুম</b>। সে নিজে     স্ক্রিনে আসে না — শুধু ভেতরের জিনিস দেখায়।</p>"]
     }
-    function fit() { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; x.setTransform(r, 0, 0, r, 0, 0); render() }
-    function tick(n) {
-      if (play) { t = Math.min(cfg.T, t + (n - last) / 1000); if (t >= cfg.T) play = false; render() }
-      last = n; requestAnimationFrame(tick)
+  },
+
+  {
+    "state": "learn", "next": 4,
+    "html": [
+      "<p class='q'>Variable = একটা নামওয়ালা বাক্স</p>",
+      "<div class='row'>     <pre class='code' data-hl='1'>name = \"Mahi\"</pre>     <div class='var'><b>name</b><span>Mahi</span></div>   </div>",
+      "<p class='note'>Variable মানে একটা <b>নামওয়ালা বাক্স</b>। তুমি কিছু রাখতে পারো ভেতরে।</p>",
+      "<p class='note'><code>=</code> মানে \"সমান\" না। মানে <b>রাখো</b>।<br><code>name = \"Mahi\"</code> → name বাক্সে     \"Mahi\" রাখো।</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": 5, "answer": 2,
+    "html": [
+      "<p class='q'>এই কোডে age কী?</p>",
+      "   <pre class='code' data-hl='1'>age = 15</pre>"],
+    "options": ["একটা সংখ্যা", "একটা হুকুম", "একটা variable (বাক্স)", "একটা Error"],
+    "wrong": {
+      "0": ["<p class='q'>না, 15 হলো সংখ্যা</p>", "   <pre class='code' data-hl='1'>age = 15</pre>", "<p class='note'><code>age</code> হলো বাক্সের <b>নাম</b>। 15 হলো সেই     বাক্সে রাখা জিনিস।</p>"],
+      "1": ["<p class='q'>না, age হুকুম না</p>", "   <pre class='code' data-hl='1'>age = 15</pre>", "<p class='note'><code>print</code> হলো হুকুম। <code>age</code> হলো একটা     বাক্সের নাম যেখানে 15 রাখা হয়েছে।</p>"],
+      "*": ["<p class='q'>না, Error নেই</p>", "   <pre class='code' data-hl='1'>age = 15</pre>", "<p class='note'>কোডটা ঠিক আছে। <code>age</code> একটা variable — মানে     নামওয়ালা বাক্স।</p>"]
     }
-    pb.onclick = () => { if (!play && t >= cfg.T) t = 0; play = !play; render() };
-    sl.oninput = () => { play = false; t = sl.value / 1000 * cfg.T; render() };
-    addEventListener('resize', fit); fit(); requestAnimationFrame(n => { last = n; tick(n) });
-  });
-}
+  },
 
-const sim = (title, T, cues, code, draw) => [
-  `<p class="q">${title}</p>`,
-  `<canvas style="display:block;width:100%;height:calc(var(--u)*16);background:var(--bg);border-radius:var(--radius)"></canvas>`,
-  `<div class="row"><button class="btn" id="pp" type="button" style="min-width:calc(var(--u)*8)">Pause</button><input type="range" min="0" max="1000" value="0" style="flex:1;accent-color:var(--blue)"></div>`,
-  `<p class="note" id="say"></p>`, `<div id="eq"></div>`,
-  `<pre class="code">\n${code}\n</pre>`,
-  `<script>(${rt})(${JSON.stringify({ T, cues })},${draw})<\/script>`];
+  {
+    "state": "learn", "next": 6,
+    "html": [
+      "<p class='q'>String মানে লেখা (text)</p>",
+      "   <pre class='code' data-hl='1'>name = \"Mahi\"</pre>",
+      "<p class='note'><code>\"Mahi\"</code> হলো একটা <b>String</b>। String মানে <b>লেখা</b> বা <b>text</b>।</p>",
+      "<p class='note'>লেখা সবসময় <b>quotes (<code>\"\"</code>) এর ভেতরে</b> রাখতে হয়। এভাবে কম্পিউটার বোঝে: \"এটা লেখা\"।   </p>",
+      "<p class='note'>Single quote (<code>''</code>) দিয়েও হয়: <code>name = 'Mahi'</code> — দুটো একই কাজ করে।</p>"]
+  },
 
-const learn = html => ({ state: 'learn', html });
-const mcq = (html, options, answer, o = {}) => ({ state: 'mcq', html, options, answer, ...o });
+  {
+    "state": "learn", "next": 7,
+    "html": [
+      "<p class='q'>⚠️ Quotes না দিলে কী হয়?</p>",
+      "   <pre class='code' data-hl='1'>name = Mahi</pre>",
+      "<p class='note'>❌ এটা <b>Error</b> দেবে!</p>",
+      "<p class='note'>কারণ: quotes ছাড়া লিখলে কম্পিউটার ভাবে <code>Mahi</code> একটা <b>variable এর নাম</b> (বাক্সের নাম)।     কিন্তু Mahi নামে কোনো বাক্স আগে তৈরি হয়নি!</p>",
+      "   <pre class='code' data-hl='1'>name = \"Mahi\"</pre>",
+      "<p class='note'>✅ Quotes দিলে কম্পিউটার বোঝে: এটা <b>লেখা</b>, variable না। কোনো বাক্স খোঁজার দরকার নেই।</p>"]
+  },
 
-const L = [
-  /* 0 */ learn(`<div class='center'><p class='q'>Motion</p>
-    <p class='note'>A body is <b>in motion</b> when its position changes with time, measured from a <b>reference frame</b> (an origin and axes).</p>
-    <p class='note'><b>1 axis:</b> motion along a straight line (x only).<br><b>2 axes:</b> motion in a plane (x and y together), like a thrown ball.</p></div>`),
-  /* 1 */ mcq(`<div class='center'><p class='q'>You sit in a moving train. Relative to the train, you are:</p></div>`,
-    ['At rest', 'In motion', 'Falling', 'Accelerating'], 0,
-    { wrong: `<p class='q'>Not quite.</p><p class='note'>Your position relative to the train does not change. Motion depends on the reference frame.</p>` }),
+  {
+    "state": "mcq", "is_column": false, "next": 8, "answer": 0,
+    "html": [
+      "<p class='q'>কোনটা সঠিক?</p>",
+      "<p class='note'>একটা variable-এ \"Rafi\" নাম রাখতে চাই।</p>"],
+    "options": ["name = \"Rafi\"", "name = Rafi", "\"name\" = Rafi", "name = 'Rafi"],
+    "wrong": {
+      "1": ["<p class='q'>না, quotes ছাড়া Error!</p>", "   <pre class='code' data-hl='1'>name = Rafi</pre>", "<p class='note'>Quotes ছাড়া কম্পিউটার ভাবে <code>Rafi</code> একটা     variable নাম। কিন্তু Rafi নামে কোনো variable নেই — তাই Error!</p>"],
+      "2": ["<p class='q'>না, variable নামে quotes দিতে নেই</p>", "   <pre class='code' data-hl='1'>\"name\" = Rafi</pre>", "<p class='note'>Variable নাম (বাক্সের নাম) <b>quotes ছাড়া</b>     লিখতে হয়। Quotes শুধু <b>লেখা/text</b> এর জন্য।</p>"],
+      "*": ["<p class='q'>না, quote শেষ হয়নি!</p>", "   <pre class='code' data-hl='1'>name = 'Rafi</pre>", "<p class='note'>Quote শুরু করলে <b>শেষেও</b> quote দিতে হয়।<br>✅     <code>'Rafi'</code> অথবা <code>\"Rafi\"</code>   </p>"]
+    }
+  },
 
-  /* 2 */ learn(`<p class='q'>1 axis: distance vs displacement</p><p class='note'><b>Distance</b> = total path length (scalar, never negative).<br><b>Displacement</b> = final position minus start position (vector, has a sign).</p>`),
-  /* 3 */ sim('Walk 8 m right, then 5 m back', 6.5, [
-    [0, 'Start at x = 0 and walk right.', 'x0 = 0', 1],
-    [4, 'After 4 s we reach x = 8 m and turn back.', 'x1 = 8', 2],
-    [6, 'Walking back 5 m, we stop at x = 3 m.', 'x2 = 3', 3],
-    [6.2, 'Distance adds every piece of the path.', 'd = 8 + 5 = 13 m', 4],
-    [6.4, 'Displacement only compares end and start.', 'Δx = 3 − 0 = 3 m', 5]],
-    'x0 = 0\nx1 = 8\nx2 = 3\ndistance = (x1 - x0) + (x1 - x2)\ndisplacement = x2 - x0',
-    (x, t, W, H, C) => {
-      const p = t < 4 ? 2 * t : t < 6 ? 8 - (t - 4) * 2.5 : 3, d = t < 4 ? 2 * t : t < 6 ? 8 + (t - 4) * 2.5 : 13, X = v => 20 + v * (W - 40) / 10, y = H * .6;
-      C.L(x, X(0), y, X(10), y, C.g, 2); for (let i = 0; i <= 10; i += 2) { C.L(x, X(i), y - 5, X(i), y + 5, C.g, 2); C.T(x, i, X(i), y + 22, C.t) }
-      C.D(x, X(p), y - 14, 9, C.b); C.T(x, 'distance = ' + d.toFixed(1) + ' m', 10, 24, C.t, 'left'); C.T(x, 'displacement = ' + p.toFixed(1) + ' m', 10, 46, C.b, 'left')
-    }),
-  /* 4 */ mcq(`<div class='center'><p class='q'>A runner goes 10 m east then 10 m west. Displacement?</p></div>`, ['20 m', '10 m', '0 m', '5 m'], 2, { is_column: true,
-    wrong: `<p class='q'>Not quite.</p><p class='note'>Displacement = end − start. He is back at the start.</p>` }),
+  {
+    "state": "learn", "next": 9,
+    "html": [
+      "<p class='q'>Number — সংখ্যায় quotes লাগে না</p>",
+      "   <pre class='code' data-hl='1,2'>age = 15\nprice = 100</pre>",
+      "<div class='row'>     <div class='var'><b>age</b><span>15</span></div>     <div class='var'><b>price</b><span>100</span></div>   </div>",
+      "<p class='note'>সংখ্যা লিখতে <b>quotes লাগে না</b>। শুধু সংখ্যাটা লেখো।</p>",
+      "<p class='note'><code>15</code> আর <code>100</code> হলো <b>Integer</b> (পুরো সংখ্যা, দশমিক নেই)।</p>"]
+  },
 
-  /* 5 */ learn(`<p class='q'>Speed, velocity, acceleration</p>
-    <p class='note'>Average speed = distance ÷ time (scalar)<br>Average velocity <code>v = Δx / Δt</code> (vector)<br>Acceleration <code>a = (v − u) / t</code>: how fast velocity changes.</p>
-    <p class='note'>Uniform acceleration (constant <code>a</code>) gives three equations. Watch them being built.</p>`),
-  /* 6 */ sim('Equation 1: v = u + at', 6, [
-    [0, 'The car starts with initial velocity u = 2 m/s.', 'u = 2', 1],
-    [1, 'Acceleration is change of velocity per second.', 'a = (v − u) / t', 2],
-    [2.5, 'Multiply both sides by t.', 'at = v − u', 3],
-    [4, 'Move u across: this is the first equation.', 'v = u + at', 4],
-    [5.5, 'Check: 2 + 1.5 × 6 = 11 m/s.', 'v = 11 m/s', 5]],
-    'u = 2\na = 1.5\nt = 6\nv = u + a*t\nprint(v)',
-    (x, t, W, H, C) => {
-      const k = Math.min(t, 6), X = q => 20 + q * (W - 90) / 39, y = H * .65, p = 2 * k + .75 * k * k, v = 2 + 1.5 * k;
-      C.L(x, X(0), y, X(39), y, C.g, 2); C.D(x, X(p), y - 12, 10, C.b); C.L(x, X(p) - v * 5, y - 36, X(p), y - 36, C.b, 4);
-      C.T(x, 'v = ' + v.toFixed(1) + ' m/s', 10, 24, C.t, 'left'); C.T(x, 't = ' + k.toFixed(1) + ' s', 10, 46, C.g, 'left')
-    }),
-  /* 7 */ mcq(`<div class='center'><p class='q'>A car starts from rest, a = 2 m/s². Speed after 5 s?</p></div>`, ['5', '7', '10', '20'], 2, { is_column: true,
-    wrong: `<p class='q'>Not quite.</p><p class='note'>v = u + at = 0 + 2 × 5.</p>` }),
+  {
+    "state": "mcq", "is_column": true, "next": 10, "answer": 2,
+    "html": [
+      "<p class='q'>কোনটা সংখ্যা (Integer)?</p>"],
+    "options": ["\"25\"", "\"age\"", "25", "age"],
+    "wrong": {
+      "0": ["<p class='q'>না, \"25\" হলো String!</p>", "<p class='note'>Quotes থাকলে সেটা সবসময় <b>লেখা       (String)</b>।<br><code>\"25\"</code> দেখতে সংখ্যা, কিন্তু কম্পিউটারের কাছে এটা text।</p>"],
+      "1": ["<p class='q'>না, \"age\" একটা String</p>", "<p class='note'>Quotes আছে, তাই এটা <b>লেখা</b>। সংখ্যা হলে quotes     থাকবে না।</p>"],
+      "*": ["<p class='q'>না, age একটা variable নাম</p>", "<p class='note'><code>age</code> কোনো সংখ্যা না — এটা quotes ছাড়া     একটা শব্দ, তাই Python এটাকে <b>variable</b> (বাক্স) মনে করে।</p>"]
+    }
+  },
 
-  /* 8 */ sim('Equation 2: s = ut + ½at²', 6, [
-    [0, 'Displacement equals the area under the v–t graph.', 's = area under v–t', 1],
-    [1, 'The rectangle has height u and width t.', 'rectangle = u·t', 4],
-    [2.5, 'The triangle has base t and height v − u = at.', 'triangle = ½ · t · at', 5],
-    [4, 'Add the two areas.', 's = ut + ½at²', 6]],
-    'u = 2\na = 1.5\nt = 6\nrect = u*t\ntri = 0.5*t*(a*t)\ns = rect + tri',
-    (x, t, W, H, C) => {
-      const k = Math.min(t, 6), ox = 40, oy = H - 24, sx = (W - 70) / 6, sy = (H - 50) / 11, X = a => ox + a * sx, Y = v => oy - v * sy;
-      x.fillStyle = C.s; x.beginPath(); x.moveTo(X(0), Y(0)); x.lineTo(X(0), Y(2)); x.lineTo(X(k), Y(2 + 1.5 * k)); x.lineTo(X(k), Y(0)); x.fill();
-      C.L(x, X(0), oy, X(6), oy, C.g, 2); C.L(x, X(0), oy, X(0), Y(11), C.g, 2); C.L(x, X(0), Y(2), X(6), Y(2), C.g, 1); C.L(x, X(0), Y(2), X(6), Y(11), C.b, 3);
-      C.D(x, X(k), Y(2 + 1.5 * k), 6, C.b); C.T(x, 's = ' + (2 * k + .75 * k * k).toFixed(1) + ' m', W - 10, 24, C.t, 'right'); C.T(x, 'v', ox - 16, 20, C.g); C.T(x, 't', W - 10, oy - 8, C.g, 'right')
-    }),
-  /* 9 */ sim('Equation 3: v² = u² + 2as', 6, [
-    [0, 'We know u, a and s but not the time t.', '', 1],
-    [1, 'Distance = average velocity × time.', 's = ((u + v)/2) · t', 3],
-    [2, 'From equation 1, t = (v − u)/a. Substitute.', 's = (u + v)(v − u) / 2a', 3],
-    [3.2, '(u + v)(v − u) = v² − u². Multiply by 2a.', '2as = v² − u²', 4],
-    [4.3, 'Rearranged: the third equation, no t needed.', 'v² = u² + 2as', 4],
-    [5.5, 'v = √(4 + 30) ≈ 5.83 m/s.', 'v ≈ 5.83 m/s', 5]],
-    'u = 2\na = 1.5\ns = 10\nv2 = u**2 + 2*a*s\nv = v2 ** 0.5',
-    (x, t, W, H, C) => {
-      const k = Math.min(t / 6, 1) * 2.554, p = 2 * k + .75 * k * k, v = 2 + 1.5 * k, X = q => 20 + q * (W - 40) / 10, y = H * .6;
-      C.L(x, X(0), y, X(10), y, C.g, 2); C.L(x, X(10), y - 16, X(10), y + 16, C.b, 3); C.D(x, X(p), y - 12, 10, C.b);
-      C.T(x, 'v = ' + v.toFixed(2) + ' m/s', 10, 24, C.t, 'left'); C.T(x, 's = ' + p.toFixed(1) + ' m', 10, 46, C.g, 'left')
-    }),
-  /* 10 */ mcq(`<div class='center'><p class='q'>Start from rest, a = 2 m/s², s = 9 m. Final speed?</p></div>`, ['3', '6', '9', '18'], 1, { is_column: true,
-    wrong: `<p class='q'>Not quite.</p><p class='note'>v² = 0 + 2 × 2 × 9 = 36, so v = 6.</p>` }),
+  {
+    "state": "learn", "next": 11,
+    "html": [
+      "<p class='q'>\"12\" আর 12 — কি একই জিনিস?</p>",
+      "<div class='row'>     <pre class='code' data-hl='1'>a = \"12\"</pre>     <div class='var'><b>a</b><span>\"12\" (লেখা)</span></div>   </div>",
+      "<div class='row'>     <pre class='code' data-hl='1'>b = 12</pre>     <div class='var'><b>b</b><span>12 (সংখ্যা)</span></div>   </div>",
+      "<p class='note'>❌ <b>একই না!</b></p>",
+      "<p class='note'><code>\"12\"</code> = লেখা (String)। কম্পিউটার একে দুটো অক্ষর \"1\" আর \"2\" হিসেবে     দেখে।<br><code>12</code> = সংখ্যা (Integer)। এটা দিয়ে যোগ-বিয়োগ করা যায়।</p>"]
+  },
 
-  /* 11 */ sim('Free fall: a = g', 6, [
-    [0, 'Released from rest: u = 0. Only gravity acts, so a = g.', 'a = g ≈ 10 m/s²', 1],
-    [1.5, 'Put u = 0, a = g in v = u + at.', 'v = gt', 3],
-    [3, 'Put u = 0, a = g in s = ut + ½at².', 'h = ½gt²', 4],
-    [4.5, 'Put them in v² = u² + 2as. Mass never appears.', 'v² = 2gh', 4]],
-    'g = 10\nt = 2\nv = g*t\nh = 0.5*g*t**2',
-    (x, t, W, H, C) => {
-      const k = Math.min(t / 6, 1) * 2, d = 5 * k * k, v = 10 * k, Y = q => 20 + q * (H - 50) / 20, cx = W / 2;
-      C.L(x, 20, H - 20, W - 20, H - 20, C.g, 2); C.D(x, cx, Y(d), 10, C.b); C.L(x, cx + 24, Y(d), cx + 24, Y(d) + v * .8, C.b, 4);
-      C.T(x, 'v = ' + v.toFixed(0) + ' m/s', 10, 24, C.t, 'left'); C.T(x, 'fallen = ' + d.toFixed(1) + ' m', 10, 46, C.g, 'left')
-    }),
+  {
+    "state": "mcq", "is_column": true, "next": 12, "answer": 1,
+    "html": [
+      "<p class='q'>\"5\" + \"3\" এর ফলাফল কী?</p>",
+      "   <pre class='code' data-hl='1,2'>result = \"5\" + \"3\"\nprint(result)</pre>",
+      "<p class='note'>মনে রাখো: quotes মানে লেখা (text)।</p>"],
+    "options": ["8", "53", "Error", "\"8\""],
+    "wrong": {
+      "0": ["<p class='q'>না, 8 না!</p>", "<p class='note'>\"5\" আর \"3\" হলো <b>লেখা</b>, সংখ্যা না।<br>লেখা + লেখা =     <b>জোড়া লাগে</b>।<br>\"5\" + \"3\" = \"53\" → স্ক্রিনে আসে <code>53</code>   </p>"],
+      "2": ["<p class='q'>না, Error হবে না</p>", "<p class='note'>দুটো String যোগ করা যায়! কিন্তু সংখ্যার যোগ হয় না —     <b>লেখা জোড়া লাগে</b>।   </p>"],
+      "*": ["<p class='q'>প্রায় ঠিক, কিন্তু...</p>", "<p class='note'>print করলে quotes <b>স্ক্রিনে দেখা যায় না</b>। তাই     output শুধু <code>53</code>, \"8\" না।</p>"]
+    }
+  },
 
-  /* 12 */ learn(`<p class='q'>2 axes: split into x and y</p>
-    <p class='note'>In a plane, motion along x and y are <b>independent</b>. Split every vector into components: <code>ux = u cosθ</code>, <code>uy = u sinθ</code>.</p>
-    <p class='note'>A projectile has <code>ax = 0</code> (constant horizontal velocity) and <code>ay = −g</code>. Use the 1-axis equations on each axis separately.</p>`),
-  /* 13 */ sim('Projectile: u = 20 m/s at 45°', 6, [
-    [0, 'Split the launch velocity into two independent parts.', 'ux = u cosθ , uy = u sinθ', 4],
-    [1.2, 'Horizontal: no force, constant velocity (grey dot on ground).', 'x = ux · t', 4],
-    [2.4, 'Vertical: gravity acts (grey dot on left wall).', 'y = uy·t − ½gt²', 5],
-    [3.6, 'At the top vy = 0, and time up = time down.', 'T = 2uy / g', 6],
-    [4.6, 'Put t = uy/g in y to get the peak.', 'H = uy² / 2g', 7],
-    [5.3, 'Range = horizontal velocity × flight time.', 'R = ux · T = u² sin2θ / g', 8]],
-    'import math\nu = 20\nth = math.radians(45)\nux = u*math.cos(th)\nuy = u*math.sin(th)\nT = 2*uy/10\nH = uy**2/(2*10)\nR = ux*T',
-    (x, t, W, H, C) => {
-      const k = Math.min(t / 6, 1) * 2.83, u = 14.14, s = Math.min((W - 40) / 40, (H - 50) / 10.5), X = a => 20 + a * s, Y = b => H - 24 - b * s, px = u * k, py = u * k - 5 * k * k;
-      C.L(x, X(0), Y(0), X(40), Y(0), C.g, 2); x.strokeStyle = C.e; x.lineWidth = 2; x.beginPath();
-      for (let i = 0; i <= 40; i++) { const q = i / u; x.lineTo(X(i), Y(u * q - 5 * q * q)) } x.stroke();
-      C.L(x, X(px), Y(py), X(px), Y(0), C.e, 1); C.L(x, X(0), Y(py), X(px), Y(py), C.e, 1);
-      C.D(x, X(px), Y(0), 5, C.g); C.D(x, X(0), Y(py), 5, C.g); C.D(x, X(px), Y(py), 9, C.b);
-      C.T(x, 'x = ' + px.toFixed(1) + '  y = ' + py.toFixed(1), W - 10, 24, C.t, 'right')
-    }),
-  /* 14 */ mcq(`<div class='center'><p class='q'>At the highest point of a projectile, which is zero?</p></div>`,
-    ['Horizontal velocity', 'Vertical velocity', 'Acceleration', 'Speed'], 1,
-    { wrong: `<p class='q'>Not quite.</p><p class='note'>vx stays constant, and g always acts. Only vy = uy − gt reaches 0 at the top.</p>` }),
-  /* 15 */ mcq(`<div class='center'><p class='q'>For the same speed, the range R = u² sin2θ / g is largest at:</p></div>`, ['30°', '45°', '60°', '90°'], 1, { is_column: true,
-    wrong: `<p class='q'>Not quite.</p><p class='note'>sin2θ is biggest (=1) when 2θ = 90°.</p>` })
+  {
+    "state": "learn", "next": 13,
+    "html": [
+      "<p class='q'>Float — দশমিক সংখ্যা</p>",
+      "   <pre class='code' data-hl='1,2'>height = 5.6\nprice = 99.99</pre>",
+      "<div class='row'>     <div class='var'><b>height</b><span>5.6</span></div>     <div class='var'><b>price</b><span>99.99</span></div>   </div>",
+      "<p class='note'>দশমিক সংখ্যাকে বলে <b>Float</b>।</p>",
+      "<p class='note'><code>5.6</code> আর <code>99.99</code> হলো Float। Integer এর মতোই, কিন্তু পয়েন্ট (<code>.</code>)     আছে।</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 14, "answer": 2,
+    "html": [
+      "<p class='q'>কোনটা Float?</p>"],
+    "options": ["42", "\"3.14\"", "3.14", "three"],
+    "wrong": {
+      "0": ["<p class='q'>না, 42 একটা Integer</p>", "<p class='note'>42 পুরো সংখ্যা, কোনো দশমিক নেই। Float এ <b>দশমিক পয়েন্ট       (.)</b> থাকে।</p>"],
+      "1": ["<p class='q'>না, \"3.14\" একটা String!</p>", "<p class='note'>Quotes আছে মানে এটা <b>লেখা</b>! Float হতে হলে     quotes ছাড়া লিখতে হবে: <code>3.14</code></p>"],
+      "*": ["<p class='q'>না, three একটা variable নাম</p>", "<p class='note'><code>three</code> quotes ছাড়া একটা শব্দ, তাই     Python এটাকে variable নাম মনে করবে। সংখ্যা না।</p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 15,
+    "html": [
+      "<p class='q'>Boolean — সত্য অথবা মিথ্যা</p>",
+      "   <pre class='code' data-hl='1,2'>is_student = True\nis_tall = False</pre>",
+      "<div class='row'>     <div class='var'><b>is_student</b><span>True ✅</span></div>     <div class='var'><b>is_tall</b><span>False ❌</span></div>   </div>",
+      "<p class='note'>Boolean এর মাত্র <b>২টা</b> মান: <code>True</code> (সত্য) আর <code>False</code> (মিথ্যা)।</p>",
+      "<p class='note'>⚠️ T আর F <b>বড় হাতের</b> হতে হবে।<br><code>True</code> ✅ ঠিক<br><code>true</code> ❌ Error!</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 16, "answer": 3,
+    "html": [
+      "<p class='q'>কোনটা Boolean?</p>"],
+    "options": ["\"True\"", "true", "1", "False"],
+    "wrong": {
+      "0": ["<p class='q'>না, \"True\" হলো String!</p>", "<p class='note'>Quotes আছে, তাই এটা <b>লেখা</b>। Boolean     <code>True</code> লিখতে হয় <b>quotes ছাড়া</b>।   </p>"],
+      "1": ["<p class='q'>না, ছোট হাতের true চলে না!</p>", "<p class='note'>Python এ Boolean লিখতে হয় <b>বড় হাতের T</b>     দিয়ে: <code>True</code>।<br>ছোট হাতের <code>true</code> লিখলে Python ভাবে এটা variable নাম — Error!</p>"],
+      "*": ["<p class='q'>না, 1 একটা Integer</p>", "<p class='note'><code>1</code> একটা সংখ্যা (Integer)।<br>Boolean হলো শুধু     <code>True</code> অথবা <code>False</code>।   </p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 17,
+    "html": [
+      "<p class='q'>type() — জিনিসের ধরন জানো</p>",
+      "   <pre class='code' data-hl='1,2,3,4'>print(type(\"Mahi\"))\nprint(type(15))\nprint(type(3.14))\nprint(type(True))</pre>   ",
+      "<p class='note'>Output:</p>",
+      "   <pre class='code'>&lt;class 'str'&gt;\n&lt;class 'int'&gt;\n&lt;class 'float'&gt;\n&lt;class 'bool'&gt;</pre>",
+      "<p class='note'><code>str</code> = String (লেখা)<br><code>int</code> = Integer (পুরো সংখ্যা)<br><code>float</code> =     Float (দশমিক সংখ্যা)<br><code>bool</code> = Boolean (সত্য/মিথ্যা)</p>",
+      "<p class='note'><code>type()</code> দিয়ে যেকোনো জিনিসের <b>ধরন</b> জানা যায়। ভুল ধরতে কাজে লাগে!</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": 18, "answer": 0,
+    "html": [
+      "<p class='q'>type(\"100\") কী দেবে?</p>",
+      "   <pre class='code' data-hl='1'>print(type(\"100\"))</pre>",
+      "<p class='note'>ভালো করে দেখো: quotes আছে কি নেই?</p>"],
+    "options": ["str", "int", "float", "bool"],
+    "wrong": {
+      "1": ["<p class='q'>না, int না!</p>", "   <pre class='code' data-hl='1'>print(type(\"100\"))</pre>", "<p class='note'>\"100\" দেখতে সংখ্যা, কিন্তু <b>quotes       আছে</b>! Quotes মানে সবসময় String।</p>"],
+      "*": ["<p class='q'>না, আবার দেখো</p>", "   <pre class='code' data-hl='1'>print(type(\"100\"))</pre>", "<p class='note'><code>\"100\"</code> এর চারপাশে     <b>quotes</b> আছে। Quotes মানে সবসময় <b>String (str)</b>।   </p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 19,
+    "html": [
+      "<p class='q'>Variable এর মান বদলানো যায়</p>",
+      "   <pre class='code' data-hl='1,2,3'>x = 5\nx = 10\nprint(x)</pre>",
+      "<div class='row'>     <div class='var'><b>x (আগে)</b><span>5</span></div><svg class='g' viewBox='0 0 24 24'>       <path d='M5 12h14M13 6l6 6-6 6' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'         stroke-linejoin='round' />     </svg>     <div class='var'><b>x (এখন)</b><span>10</span></div>   </div>",
+      "<p class='note'>প্রথমে x বাক্সে 5 ছিল। তারপর 10 রাখা হলো।</p>",
+      "<p class='note'><b>পুরনো মান মুছে যায়।</b> বাক্সে একসাথে একটাই জিনিস থাকে।<br>তাই <code>print(x)</code> দেখাবে     <code>10</code>।   </p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 20, "answer": 1,
+    "html": [
+      "<p class='q'>কী print হবে?</p>",
+      "   <pre class='code' data-hl='1,2,3'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>"],
+    "options": ["Rafi", "Mahi", "Rafi Mahi", "Error"],
+    "wrong": {
+      "0": ["<p class='q'>না, Rafi মুছে গেছে!</p>", "   <pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>", "<p class='note'>লাইন 2 তে name     বাক্সে নতুন করে \"Mahi\" রাখা হয়েছে। পুরনো \"Rafi\" <b>মুছে গেছে</b>।</p>"],
+      "2": ["<p class='q'>না, দুটো একসাথে আসে না</p>", "   <pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>", "<p class='note'>Variable <b>একসাথে       একটাই মান</b> রাখে। শেষেরটা থাকে, আগেরটা মুছে যায়।</p>"],
+      "*": ["<p class='q'>না, Error নেই</p>", "   <pre class='code' data-hl='2'>name = \"Rafi\"\nname = \"Mahi\"\nprint(name)</pre>", "<p class='note'>Variable এর মান     বদলানো সম্পূর্ণ ঠিক। Python এ কোনো সমস্যা নেই।</p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 21,
+    "html": [
+      "<p class='q'>Variable নামের নিয়ম</p>",
+      "   <pre class='code' data-hl='1,2,3'>my_name = \"Mahi\"\nage2 = 15\n_score = 90</pre>",
+      "<p class='note'>✅ নামে <b>letter</b> (a-z, A-Z), <b>number</b> (0-9), আর <b>_</b> (underscore) থাকতে পারে।</p>",
+      "   <pre class='code' data-hl='1,2'>2name = \"Mahi\"\nmy name = \"Mahi\"</pre>",
+      "<p class='note'>❌ নাম <b>number দিয়ে শুরু</b> হতে পারে না।<br>❌ নামে <b>space</b> (ফাঁকা জায়গা) থাকতে পারে     না।<br>Space এর বদলে <code>_</code> ব্যবহার করো!</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": 22, "answer": 1,
+    "html": [
+      "<p class='q'>কোন variable নামটা সঠিক?</p>"],
+    "options": ["1st_name", "first_name", "first name", "first-name"],
+    "wrong": {
+      "0": ["<p class='q'>না, number দিয়ে শুরু!</p>", "<p class='note'>Variable নাম <b>সংখ্যা দিয়ে শুরু</b> হতে পারে     না।<br><code>1st_name</code> ❌ → <code>first_name</code> ✅</p>"],
+      "2": ["<p class='q'>না, space আছে!</p>", "<p class='note'>Variable নামে <b>space</b> থাকতে পারে না।<br>Space এর বদলে     <code>_</code> ব্যবহার করো: <code>first_name</code>   </p>"],
+      "*": ["<p class='q'>না, dash (-) চলে না!</p>", "<p class='note'>Variable নামে <b>hyphen (-)</b> ব্যবহার করা যায়     না।<br><code>_</code> (underscore) ব্যবহার করো: <code>first_name</code></p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 23,
+    "html": [
+      "<p class='q'>print(name) vs print(\"name\")</p>",
+      "   <pre class='code' data-hl='2'>name = \"Mahi\"\nprint(name)</pre>",
+      "<p class='note'>⚠️ <code>print(name)</code> — quotes নেই! তাই Python জানে <code>name</code> একটা     <b>variable</b>।<br>Python বাক্স খুলে দেখে: name এ আছে \"Mahi\"।<br>তাই স্ক্রিনে আসে: <code>Mahi</code>   </p>",
+      "   <pre class='code' data-hl='1'>print(\"name\")</pre>",
+      "<p class='note'>কিন্তু <code>print(\"name\")</code> লিখলে? Quotes আছে, তাই Python ভাবে এটা <b>লেখা</b>। কোনো বাক্স     খোঁজে না।<br>স্ক্রিনে আসে: <code>name</code> (শব্দটা, বাক্সের মান না)</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 24, "answer": 0,
+    "html": [
+      "<p class='q'>কী print হবে?</p>",
+      "   <pre class='code' data-hl='2'>city = \"Dhaka\"\nprint(\"city\")</pre>"],
+    "options": ["city", "Dhaka", "\"city\"", "Error"],
+    "wrong": {
+      "1": ["<p class='q'>না, Dhaka না!</p>", "   <pre class='code' data-hl='2'>city = \"Dhaka\"\nprint(\"city\")</pre>", "<p class='note'>Dhaka আসতে হলে লিখতে হতো     <code>print(city)</code> — quotes <b>ছাড়া</b>।<br>কিন্তু এখানে <code>\"city\"</code> quotes <b>সহ</b> আছে, তাই এটা     শুধু <b>লেখা</b>।   </p>"],
+      "2": ["<p class='q'>না, quotes স্ক্রিনে আসে না</p>", "<p class='note'>print করলে quotes <b>স্ক্রিনে দেখা যায় না</b>।     শুধু ভেতরের লেখা আসে।</p>"],
+      "*": ["<p class='q'>না, Error নেই</p>", "<p class='note'>কোডটা ঠিক আছে। <code>\"city\"</code> একটা String — সেটাই print     হবে।</p>"]
+    }
+  },
+
+  {
+    "state": "learn", "next": 25,
+    "html": [
+      "<p class='q'>সবকিছু একসাথে — পুরো ছবি</p>",
+      "   <pre class='code'     data-hl='1,2,3,4'>name = \"Mahi\"       # str (লেখা)\nage = 13             # int (পুরো সংখ্যা)\nheight = 5.2         # float (দশমিক)\nis_student = True    # bool (সত্য/মিথ্যা)</pre>   ",
+      "<p class='note'>Python এ ৪ ধরনের basic data type:</p>",
+      "<p class='note'><b>str</b> → লেখা, quotes (<code>\"\"</code>) দিতে হয়<br><b>int</b> → পুরো সংখ্যা, quotes লাগে     না<br><b>float</b> → দশমিক সংখ্যা, পয়েন্ট (<code>.</code>) আছে<br><b>bool</b> → শুধু <code>True</code> /     <code>False</code>   </p>",
+      "<p class='note'>এবার কিছু টাস্ক দিয়ে দেখি তুমি কতটা শিখেছো! 💪</p>"]
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": 26, "answer": 2,
+    "html": [
+      "<p class='q'>🧪 টাস্ক ১: কী print হবে?</p>",
+      "   <pre class='code' data-hl='1,2,3'>x = \"Hello\"\ny = \"World\"\nprint(x + y)</pre>"],
+    "options": ["Hello World", "x + y", "HelloWorld", "Error"],
+    "wrong": {
+      "0": ["<p class='q'>প্রায় ঠিক, কিন্তু space নেই!</p>", "   <pre class='code' data-hl='3'>x = \"Hello\"\ny = \"World\"\nprint(x + y)</pre>", "<p class='note'>String যোগ করলে     <b>হুবহু জোড়া লাগে</b>। মাঝে আপনা থেকে space আসে না।<br>\"Hello\" + \"World\" = \"HelloWorld\"   </p>"],
+      "1": ["<p class='q'>না, x + y লেখা আসে না</p>", "<p class='note'><code>x</code> আর <code>y</code> quotes ছাড়া, তাই     এগুলো <b>variable</b>। Python বাক্স খুলে দেখবে কী আছে ভেতরে।</p>"],
+      "*": ["<p class='q'>না, Error নেই</p>", "<p class='note'>দুটো String যোগ করা যায়। \"Hello\" + \"World\" =     \"HelloWorld\"</p>"]
+    }
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": 27, "answer": 3,
+    "html": [
+      "<p class='q'>🧪 টাস্ক ২: কোনটা Error দেবে?</p>"],
+    "options": ["name = \"Mahi\"", "age = 15", "is_happy = True", "score = Mahi"],
+    "wrong": {
+      "0": ["<p class='q'>না, এটা ঠিক আছে!</p>", "   <pre class='code' data-hl='1'>name = \"Mahi\"</pre>", "<p class='note'>\"Mahi\" quotes এ আছে, তাই এটা String। ✅ সঠিক।   </p>"],
+      "1": ["<p class='q'>না, এটাও ঠিক!</p>", "   <pre class='code' data-hl='1'>age = 15</pre>", "<p class='note'>15 একটা সংখ্যা (Integer), quotes ছাড়া। ✅ সঠিক।</p>"],
+      "*": ["<p class='q'>না, এটা সঠিক!</p>", "   <pre class='code' data-hl='1'>is_happy = True</pre>", "<p class='note'><code>True</code> একটা Boolean। বড় T দিয়ে     লেখা। ✅ সঠিক।<br>কিন্তু <code>score = Mahi</code>? Mahi quotes ছাড়া — Python ভাবে এটা variable। কিন্তু Mahi নামে     কোনো variable নেই! ❌</p>"]
+    }
+  },
+
+  {
+    "state": "mcq", "is_column": true, "next": 28, "answer": 1,
+    "html": [
+      "<p class='q'>🧪 টাস্ক ৩: কী print হবে?</p>",
+      "   <pre class='code' data-hl='1,2,3'>a = 10\na = 20\nprint(a)</pre>"],
+    "options": ["10", "20", "10 20", "Error"],
+    "wrong": {
+      "0": ["<p class='q'>না, 10 মুছে গেছে!</p>", "   <pre class='code' data-hl='2'>a = 10\na = 20\nprint(a)</pre>", "<p class='note'>লাইন 2 তে a বাক্সে <b>নতুন মান 20</b>     রাখা হয়েছে। পুরনো 10 আর নেই।</p>"],
+      "2": ["<p class='q'>না, দুটো একসাথে আসে না</p>", "<p class='note'>Variable <b>একবারে একটাই মান</b> রাখে। শেষ যেটা রাখা     হয়েছে সেটাই থাকে।</p>"],
+      "*": ["<p class='q'>না, Error নেই</p>", "<p class='note'>Variable এর মান বদলানো Python এ সম্পূর্ণ সঠিক।</p>"]
+    }
+  },
+
+  {
+    "state": "mcq", "is_column": false, "next": null, "answer": 0,
+    "html": [
+      "<p class='q'>🧪 শেষ টাস্ক: type(3.0) কী দেবে?</p>",
+      "   <pre class='code' data-hl='1'>print(type(3.0))</pre>",
+      "<p class='note'>ভালো করে দেখো: পয়েন্ট (.) আছে কি নেই?</p>"],
+    "options": ["float", "int", "str", "bool"],
+    "wrong": {
+      "1": ["<p class='q'>না, int না!</p>", "<p class='note'><code>3.0</code> দেখতে পুরো সংখ্যা মনে হলেও <b>দশমিক পয়েন্ট       (.)</b> আছে।<br>পয়েন্ট থাকলেই সেটা <b>float</b>!</p>"],
+      "2": ["<p class='q'>না, str না!</p>", "<p class='note'><code>3.0</code> তে <b>quotes নেই</b>। Quotes ছাড়া সংখ্যা হলে     সেটা int অথবা float।</p>"],
+      "*": ["<p class='q'>না, bool না!</p>", "<p class='note'>Boolean শুধু <code>True</code> আর     <code>False</code>।<br><code>3.0</code> একটা সংখ্যা — দশমিক পয়েন্ট আছে, তাই <b>float</b>।   </p>"]
+    },
+    "end_html": [
+      "<div class='center'>",
+      "<svg class='g' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'       stroke-linejoin='round'>       <circle cx='12' cy='12' r='9' />       <path d='M8 12.5l3 3 5-6' />     </svg>",
+      "<p class='q'>🎉 Class 1 শেষ!</p>",
+      "<p class='note'>তুমি এখন জানো:</p>",
+      "<p class='note'>✅ <code>print()</code> — স্ক্রিনে দেখাও<br>✅ Variable — নামওয়ালা বাক্স, <code>=</code> মানে       রাখো<br>✅ <b>String (str)</b> — লেখা, quotes লাগে<br>✅ <b>Integer (int)</b> — পুরো সংখ্যা<br>✅ <b>Float         (float)</b> — দশমিক সংখ্যা<br>✅ <b>Boolean (bool)</b> — True / False<br>✅ <code>type()</code> — ধরন দেখো<br>✅       Variable নামের নিয়ম<br>✅ <code>\"12\"</code> আর <code>12</code> এক না!</p>",
+      "<p class='note'>পরের Class এ শিখবে: <b>if/else</b> আর <b>input()</b> 🚀</p>",
+      "</div>"]
+  }
 ];
-
-window.LESSONS = L.map((l, i) => ({ ...l, next: i < L.length - 1 ? i + 1 : null }));
