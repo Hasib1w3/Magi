@@ -14,6 +14,7 @@
     2. TEXT is the only thing that is BLACK.
     3. --blue is the ONLY extra color. Use it inside lessons for graphics
         that explain something (boxes, arrows, icons, code keywords).
+        --paper is plain white (screen, list cells, note cards).
     4. --mark is the highlighter: it marks the code lines to look at.
     ===================================================================== */
     :root {
@@ -21,6 +22,7 @@
       --surface: #ececee;
       --edge: #d6d6dc;
       --press: #e0e0e5;
+      --paper: #ffffff;
       --text: #111111;
       --blue: #2f6df6;
       --blue-soft: #dce6ff;
@@ -295,6 +297,307 @@
     .t-c {
       color: var(--syn-com)
     }
+
+    /* ANIMATION KIT. --d = step number, one step = .55s. Used by learn lessons. */
+    .step {
+      opacity: 0;
+      animation: rise .45s ease forwards;
+      animation-delay: calc(var(--d, 0)*.55s)
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(.4em)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .var span.fill {
+      opacity: 0;
+      animation: rise .45s ease forwards;
+      animation-delay: calc(var(--d, 0)*.55s)
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--gap)
+    }
+
+    .box {
+      padding: calc(var(--u)/2) var(--gap);
+      text-align: center;
+      background: var(--blue-soft);
+      border: var(--line) solid var(--blue);
+      border-radius: var(--radius)
+    }
+
+    .box.plain {
+      background: var(--paper);
+      border-color: var(--edge)
+    }
+
+    .g.arw {
+      height: calc(var(--u)*2)
+    }
+
+    .draw {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw .6s ease forwards;
+      animation-delay: calc(var(--d, 0)*.55s)
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    .screen {
+      padding: var(--gap);
+      min-height: calc(var(--u)*4);
+      background: var(--paper);
+      border: var(--line) solid var(--edge);
+      border-radius: var(--radius);
+      font: var(--fs-1)/1.5 var(--font-code);
+      overflow: auto
+    }
+
+    .screen>div {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere
+    }
+
+    .type {
+      display: inline-block;
+      overflow: hidden;
+      white-space: pre;
+      vertical-align: bottom;
+      width: 0;
+      animation: typing calc(var(--n)*.09s) steps(var(--n)) forwards;
+      animation-delay: calc(var(--d, 0)*.55s)
+    }
+
+    @keyframes typing {
+      to {
+        width: calc(var(--n)*1ch)
+      }
+    }
+
+    .you {
+      color: var(--blue);
+      font-weight: 700
+    }
+
+    /* data pictures: list cells and dictionary pairs */
+    .cells {
+      display: inline-flex;
+      max-width: 100%;
+      overflow: auto;
+      background: var(--paper);
+      border: var(--line) solid var(--blue);
+      border-radius: var(--radius);
+      font-family: var(--font-code)
+    }
+
+    .cell {
+      display: flex;
+      flex-direction: column;
+      min-width: calc(var(--u)*4);
+      text-align: center
+    }
+
+    .cell+.cell {
+      border-left: var(--line) solid var(--blue)
+    }
+
+    .cell b {
+      padding: calc(var(--u)/2) var(--gap);
+      font-weight: 600
+    }
+
+    .cell small {
+      background: var(--blue-soft);
+      font-size: var(--fs-0)
+    }
+
+    .cell small+small {
+      background: var(--surface);
+      color: var(--syn-com)
+    }
+
+    .pairs {
+      display: inline-flex;
+      flex-direction: column;
+      max-width: 100%;
+      overflow: hidden;
+      font-family: var(--font-code);
+      border: var(--line) solid var(--blue);
+      border-radius: var(--radius)
+    }
+
+    .pair {
+      display: flex
+    }
+
+    .pair+.pair {
+      border-top: var(--line) solid var(--blue)
+    }
+
+    .pair b {
+      padding: calc(var(--u)/2) var(--gap);
+      background: var(--blue-soft);
+      font-weight: 600
+    }
+
+    .pair span {
+      flex: 1;
+      padding: calc(var(--u)/2) var(--gap);
+      background: var(--paper)
+    }
+
+    .lab {
+      font-size: var(--fs-0);
+      color: var(--syn-com)
+    }
+
+    /* TRACE KIT: the "Start / Next" step-by-step program player */
+    .shell[data-kind="trace"] .deck {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr)
+    }
+
+    .shell[data-kind="trace"] .btn:last-child {
+      font-weight: 700
+    }
+
+    pre.code[data-trace] {
+      position: relative;
+      max-height: min(36vh, 28rem)
+    }
+
+    .hl {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 0;
+      min-width: 100%;
+      background: var(--mark);
+      opacity: 0;
+      pointer-events: none;
+      transition: top .4s ease, height .4s ease, opacity .25s
+    }
+
+    pre.code[data-trace] .ln {
+      position: relative
+    }
+
+    .code .ln.on {
+      font-weight: 600
+    }
+
+    .code .ln.on::before {
+      color: var(--text)
+    }
+
+    .tn {
+      padding: var(--gap);
+      background: var(--paper);
+      border-left: calc(var(--u)/2) solid var(--blue);
+      border-radius: var(--radius)
+    }
+
+    .tn.flip {
+      animation: rise .35s ease
+    }
+
+    .tn .tl {
+      font-size: var(--fs-0);
+      color: var(--syn-com)
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+      gap: var(--gap)
+    }
+
+    .pn {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--u)/2);
+      min-width: 0
+    }
+
+    .vs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--gap);
+      padding: var(--gap);
+      min-height: calc(var(--u)*4);
+      background: var(--paper);
+      border: var(--line) solid var(--edge);
+      border-radius: var(--radius)
+    }
+
+    .frame {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--gap);
+      width: 100%;
+      padding: calc(var(--u)/2);
+      border: var(--line) dashed var(--blue);
+      border-radius: var(--radius)
+    }
+
+    .frame>.lab {
+      width: 100%
+    }
+
+    .var.flash span {
+      animation: flash 1s ease
+    }
+
+    @keyframes flash {
+      from {
+        background: var(--blue);
+        color: var(--paper)
+      }
+    }
+
+    .ret {
+      align-self: center;
+      padding: calc(var(--u)/2) var(--gap);
+      font-family: var(--font-code);
+      background: var(--blue-soft);
+      border: var(--line) solid var(--blue);
+      border-radius: var(--radius)
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      .step,
+      .draw,
+      .type,
+      .fill,
+      .var span.fill {
+        animation-duration: .01s;
+        animation-delay: 0s
+      }
+
+      .hl {
+        transition: none
+      }
+    }
   </style>
 </head>
 
@@ -311,43 +614,142 @@
     const DS = $('ds').textContent, SLOTS = +getComputedStyle(root).getPropertyValue('--slots');
     const ICON = "<svg class='g' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3 2 20h20L12 3z'/><path d='M12 10v5M12 18v.01'/></svg>";
     const S = {
-      ok: 'Understood', again: 'Start again',
+      ok: 'Understood', again: 'Start again', start: '▶ Start', next: 'Next ▶', back: '◀ Back',
       wrong: "<p class='q'>Not quite. Look again.</p>",
       end: "<div class='center'><p class='q'>Lesson complete</p></div>",
       fail: `<div class='center'><div class='fail'>${ICON}<div><p class='q'>Server error</p><p class='note'>Something went wrong. Please try again.</p></div></div></div>`
     };
     let LESSONS = window.LESSONS || [];
 
-    /* runs INSIDE every lesson iframe: reports errors, highlights <pre class="code"> */
+    /* runs INSIDE every lesson iframe: reports errors, highlights <pre class="code">, plays traces */
     function boot() {
       addEventListener('error', () => parent.postMessage('lesson-error', '*'));
-      const K = /^(and|as|break|class|continue|def|elif|else|for|from|if|import|in|is|not|or|pass|return|while|True|False|None)$/,
-        B = /^(print|input|len|range|int|str|float|list|type|min|max|sum|abs|round)$/,
+      const K = /^(and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield|True|False|None)$/,
+        B = /^(print|input|len|range|int|str|float|bool|list|dict|set|tuple|type|min|max|sum|abs|round|open|enumerate|zip|sorted|reversed|any|all|map|filter|isinstance|super|self|cls)$/,
         esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])),
-        tok = s => s.replace(/("[^"]*"|'[^']*')|(#.*)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)|([&<>])/g, (m, q, c, n, w, x) =>
-          q ? `<i class="t-s">${esc(q)}</i>` : c ? `<i class="t-c">${esc(c)}</i>` : n ? `<i class="t-n">${n}</i>` :
-            w ? (K.test(w) ? `<i class="t-k">${w}</i>` : B.test(w) ? `<i class="t-f">${w}</i>` : w) : esc(x));
+        tok = s => { let pw = ''; return s.replace(/([fFrRbB]{0,2}(?:"[^"]*"|'[^']*'))|(#.*)|(@[A-Za-z_][\w.]*)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)|([&<>])/g, (m, q, c, d, n, w, x) => {
+          if (w) { const f = pw === 'def' || pw === 'class'; pw = w; return f ? `<i class="t-f">${w}</i>` : K.test(w) ? `<i class="t-k">${w}</i>` : B.test(w) ? `<i class="t-f">${w}</i>` : w }
+          return q ? `<i class="t-s">${esc(q)}</i>` : c ? `<i class="t-c">${esc(c)}</i>` : d ? `<i class="t-f">${d}</i>` : n ? `<i class="t-n">${n}</i>` : esc(x)
+        }) };
       document.querySelectorAll('pre.code').forEach(p => {
-        const hl = (p.dataset.hl || '').split(',').map(Number);
-        p.innerHTML = p.textContent.replace(/^\n|\n$/g, '').split('\n').map((l, i) => `<span class="ln${hl.includes(i + 1) ? ' mark' : ''}">${tok(l)}</span>`).join('');
+        const hl = (p.dataset.hl || '').split(',').map(Number); let doc = false;
+        const rows = p.textContent.replace(/^\n|\n$/g, '').split('\n').map((l, i) => {
+          const n = (l.match(/"""/g) || []).length; let h;
+          if (doc || n === 1) { h = `<i class="t-s">${esc(l)}</i>`; if (n === 1) doc = !doc } else h = tok(l);
+          return `<span class="ln${hl.includes(i + 1) ? ' mark' : ''}">${h}</span>`
+        });
+        p.innerHTML = (p.hasAttribute('data-trace') ? '<div class="hl"></div>' : '') + rows.join('');
       });
+
+      /* TRACE PLAYER: parent sends {step:n}; n = -1 means "before start" */
+      const TR = window.TRACE;
+      if (TR) {
+        const steps = TR.steps, pre = document.querySelector('pre.code[data-trace]'), box = document.querySelector('.tr');
+        const hl = pre.querySelector('.hl'), lns = [...pre.querySelectorAll('.ln')];
+        const hasVars = steps.some(s => s.v || s.g || s.call), hasOut = steps.some(s => s.ask !== undefined || s.p !== undefined);
+        const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e };
+        box.innerHTML = '<div class="tn"></div><div class="panels">' +
+          (hasVars ? '<div class="pn"><div class="lab">Memory — variable বাক্স</div><div class="vs" id="pv"></div></div>' : '') +
+          (hasOut ? '<div class="pn"><div class="lab">Screen — যা দেখা যায়</div><div class="screen" id="po"></div></div>' : '') + '</div>';
+        const tn = box.querySelector('.tn'), pv = box.querySelector('#pv'), po = box.querySelector('#po');
+        let prevV = {}, prevO = [];
+
+        const compute = i => {
+          const st = { g: {}, stack: [], out: [] };
+          for (let k = 0; k <= i; k++) {
+            const s = steps[k];
+            while (st.stack.length && st.stack[st.stack.length - 1].ret !== undefined) st.stack.pop();
+            if (s.call) st.stack.push({ n: s.call, v: {} });
+            const top = st.stack.length ? st.stack[st.stack.length - 1] : null;
+            const put = (tgt, o) => Object.keys(o).forEach(n => { if (o[n] === null) delete tgt[n]; else tgt[n] = o[n] });
+            if (s.v) put(top ? top.v : st.g, s.v);
+            if (s.g) put(st.g, s.g);
+            if (s.ret !== undefined && top) top.ret = s.ret;
+            if (s.ask !== undefined) st.out.push({ ask: s.ask });
+            if (s.type !== undefined) { const a = [...st.out].reverse().find(o => o.ask !== undefined); if (a) a.typed = s.type }
+            if (s.p !== undefined) [].concat(s.p).forEach(x => st.out.push({ p: x }));
+          }
+          return st;
+        };
+
+        const render = st => {
+          if (pv) {
+            const frames = [{ n: 'global', v: st.g }].concat(st.stack), nv = {};
+            pv.replaceChildren(...frames.map((f, fi) => {
+              const wrap = fi === 0 && frames.length === 1 ? pv : el('div', 'frame');
+              const mk = [];
+              if (frames.length > 1) mk.push(el('div', 'lab', fi === 0 ? 'global' : 'inside ' + f.n));
+              Object.keys(f.v).forEach(n => {
+                const key = fi + '|' + n, box = el('div', 'var' + (prevV[key] !== f.v[n] ? ' flash' : ''));
+                box.append(el('b', '', n), el('span', '', f.v[n])); nv[key] = f.v[n]; mk.push(box);
+              });
+              if (f.ret !== undefined) mk.push(el('div', 'ret', 'return ' + f.ret));
+              if (!mk.length) mk.push(el('div', 'lab', 'এখনো কিছু নেই'));
+              if (wrap === pv) return mk;
+              wrap.append(...mk); return [wrap];
+            }).flat());
+            prevV = nv;
+          }
+          if (po) {
+            const no = [];
+            po.replaceChildren(...st.out.map((o, j) => {
+              const key = (o.ask ?? '') + '|' + (o.typed ?? '') + '|' + (o.p ?? ''); no.push(key);
+              const fresh = prevO[j] !== key, row = el('div', fresh ? 'step' : '');
+              if (o.ask !== undefined) {
+                row.append(el('span', '', o.ask));
+                if (o.typed !== undefined) { const t = el('span', fresh ? 'type you' : 'you', o.typed); t.style.setProperty('--n', o.typed.length || 1); t.style.setProperty('--d', 1); row.append(t) }
+                else row.append(el('span', 'you', '▍'));
+              } else row.textContent = o.p;
+              return row;
+            }));
+            prevO = no;
+          }
+        };
+
+        const go = i => {
+          const s = steps[i], a = s && [].concat(s.l || 0)[0], z = s && ([].concat(s.l || 0)[1] || a);
+          lns.forEach((l, k) => l.classList.toggle('on', !!a && k + 1 >= a && k + 1 <= z));
+          if (!a) hl.style.opacity = 0;
+          else {
+            const f = lns[a - 1], l = lns[z - 1];
+            hl.style.opacity = 1; hl.style.width = pre.scrollWidth + 'px'; hl.style.top = f.offsetTop + 'px'; hl.style.height = (l.offsetTop + l.offsetHeight - f.offsetTop) + 'px';
+            if (f.offsetTop < pre.scrollTop) pre.scrollTo({ top: f.offsetTop - 12, behavior: 'smooth' });
+            else if (l.offsetTop + l.offsetHeight > pre.scrollTop + pre.clientHeight) pre.scrollTo({ top: l.offsetTop + l.offsetHeight - pre.clientHeight + 12, behavior: 'smooth' });
+          }
+          tn.innerHTML = s ? `<div class="tl">Step ${i + 1} / ${steps.length}${a ? ' · লাইন ' + a + (z > a ? '–' + z : '') : ''}</div><div>${s.t}</div>` : (TR.intro || '<b>▶ Start</b> চাপলে প্রোগ্রাম চলতে শুরু করবে। হলুদ দাগ দেখাবে এখন কোন লাইন চলছে।');
+          tn.classList.remove('flip'); void tn.offsetWidth; tn.classList.add('flip');
+          render(compute(i));
+        };
+        addEventListener('message', e => { if (e.source === parent && e.data && typeof e.data.step === 'number') go(e.data.step) });
+        go(-1); parent.postMessage('trace-ready', '*');
+      }
     }
     const lines = h => [].concat(h ?? '').join('\n');
-    const page = h => `<!doctype html><html data-theme="${root.dataset.theme || ''}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${DS}</style></head><body class="lesson">${lines(h)}<script>(${boot})()<\/script></body></html>`;
+    const page = (h, tr) => `<!doctype html><html data-theme="${root.dataset.theme || ''}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${DS}</style></head><body class="lesson">${lines(h)}${tr ? `<script>window.TRACE=${JSON.stringify(tr).replace(/</g, '\u003c')}<\/script>` : ''}<script>(${boot})()<\/script></body></html>`;
 
     /* one renderer for every screen: view = {kind, col, html, btns:[{t, run}]} */
+    const setDeck = btns => deck.replaceChildren(...btns.map(b => Object.assign(document.createElement('button'), { className: 'btn', type: 'button', textContent: b.t, onclick: b.run })));
     function show(v) {
       app.dataset.kind = v.kind; app.dataset.col = !!v.col;
-      deck.replaceChildren(...v.btns.map(b => Object.assign(document.createElement('button'), { className: 'btn', type: 'button', textContent: b.t, onclick: b.run })));
-      stage.srcdoc = page(v.html);
+      setDeck(v.btns);
+      stage.srcdoc = page(v.html, v.trace);
     }
+    let TK = -1; /* current trace step, so a late-loading iframe can catch up */
     const learnView = (html, run, kind = 'learn') => ({ kind, col: false, html, btns: [{ t: S.ok, run }] });
     const restart = html => ({ kind: 'learn', col: false, html, btns: [{ t: S.again, run: () => load(0) }] });
     const after = L => L.next == null ? show(restart(L.end_html ?? S.end)) : load(L.next);
     const wrongOf = (w, k) => w && typeof w == 'object' && !Array.isArray(w) ? (w[k] ?? w['*']) : w;
 
-    /* the two states */
+    /* the three states */
     const STATES = {
+      trace: (L, i) => {
+        if (!Array.isArray(L.steps) || !L.steps.length) throw new Error('trace needs steps');
+        const n = L.steps.length; TK = -1;
+        const btns = () => TK < 0 ? [{ t: S.start, run: () => mv(1) }]
+          : [{ t: S.back, run: () => mv(-1) }, TK === n - 1 ? { t: S.ok, run: () => after(L) } : { t: S.next, run: () => mv(1) }];
+        const mv = d => { TK += d; stage.contentWindow.postMessage({ step: TK }, '*'); setDeck(btns()) };
+        return { kind: 'trace', col: false, html: L.html, trace: { steps: L.steps, intro: L.intro }, btns: btns() };
+      },
       learn: (L) => learnView(L.html, () => after(L)),
       mcq: (L, i) => {
         if (!Array.isArray(L.options) || L.options.length !== SLOTS || !Number.isInteger(L.answer) || L.answer < 0 || L.answer >= SLOTS) throw new Error('mcq needs ' + SLOTS + ' options and a valid answer');
@@ -355,13 +757,28 @@
       }
     };
     function load(i) {
-      try { const L = LESSONS[i]; if (!L || !Object.hasOwn(STATES, L.state)) throw new Error('bad lesson index ' + i); show(STATES[L.state](L, i)) }
+      try {
+        const L = LESSONS[i]; if (!L || !Object.hasOwn(STATES, L.state)) throw new Error('bad lesson index ' + i);
+        show(STATES[L.state](L, i));
+        try { localStorage.setItem('left_page', i) } catch { }   /* remember this page (overwritten on every page) */
+      }
       catch (e) { fail(e) }
     }
     function fail(e) { console.error(e); show({ ...restart(S.fail), kind: 'fail' }) }
 
-    addEventListener('message', e => { if (e.source === stage.contentWindow && e.data === 'lesson-error' && app.dataset.kind !== 'fail') fail('error inside lesson html') });
-    load(0);
+    addEventListener('message', e => {
+      if (e.source !== stage.contentWindow) return;
+      if (e.data === 'trace-ready') stage.contentWindow.postMessage({ step: TK }, '*');
+      else if (e.data === 'lesson-error' && app.dataset.kind !== 'fail') fail('error inside lesson html')
+    });
+    /* resume where the student left off; anything missing or invalid -> page 0 */
+    const saved = (() => {
+      try {
+        const n = Number(localStorage.getItem('left_page'));
+        return Number.isInteger(n) && n >= 0 && n < LESSONS.length ? n : 0;
+      } catch { return 0 }
+    })();
+    load(saved);
   </script>
 </body>
 
