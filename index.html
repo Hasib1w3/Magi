@@ -1,7 +1,11 @@
+<!doctype html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Magi 🤡</title>
+  <meta name="theme-color" content="#ececee">
+  <title>🤡</title>
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💩</text></svg>">
   <style id="ds">
@@ -65,12 +69,15 @@
 
     html {
       height: 100dvh;
-      scroll-padding-top: env(safe-area-inset-top, 0px)
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%
     }
 
     body {
       margin: 0;
       height: 100%;
+      overscroll-behavior: none;
       background: var(--bg);
       color: var(--text);
       font: var(--fs-1)/1.6 var(--font-ui)
@@ -127,7 +134,14 @@
       border: var(--line) solid var(--edge);
       border-radius: var(--radius);
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none
+    }
+
+    .deck>.btn:only-child {
+      grid-column: 1 / -1
     }
 
     .btn:active {
@@ -583,6 +597,54 @@
       border-radius: var(--radius)
     }
 
+    /* PAGE ARROWS: tiny icon-only buttons pinned to the absolute top corners */
+    .nav {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 10;
+      display: flex;
+      align-items: flex-start;
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: calc(var(--u)/2);
+      margin: 0;
+      color: var(--syn-com);
+      background: none;
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    .nav-l {
+      left: env(safe-area-inset-left, 0px);
+      justify-content: flex-start
+    }
+
+    .nav-r {
+      right: env(safe-area-inset-right, 0px);
+      justify-content: flex-end
+    }
+
+    .nav svg {
+      width: max(1rem, calc(var(--u)*1.5));
+      height: max(1rem, calc(var(--u)*1.5))
+    }
+
+    .nav:active {
+      color: var(--text)
+    }
+
+    @media (hover:hover) {
+      .nav:hover {
+        color: var(--text)
+      }
+    }
+
+    .nav:focus-visible {
+      outline: var(--line) solid var(--text);
+      outline-offset: calc(var(--line)*-1)
+    }
+
     @media (prefers-reduced-motion:reduce) {
 
       .step,
@@ -598,10 +660,109 @@
         transition: none
       }
     }
+
+    /* TOUCH: any touch screen gets finger-sized buttons */
+    @media (pointer:coarse) {
+      .btn {
+        min-height: 3rem
+      }
+    }
+
+    /* PHONE (portrait / narrow window).
+       The desktop scale above is built on vmin, which on a portrait phone
+       is the screen WIDTH, so everything shrank like a squeezed desktop page.
+       Here we switch to a fixed, compact, readable scale instead. */
+    @media (max-width:640px) {
+      :root {
+        --u: .625rem;
+        --pad: calc(var(--u)*1.6);
+        --fs-0: .8125rem;
+        --fs-1: 1rem;
+        --fs-2: 1.0625rem;
+        --fs-3: 1.375rem
+      }
+
+      .deck {
+        max-height: 55dvh
+      }
+
+      /* 4 answers in one row are unreadable on a phone: make a 2 x 2 grid */
+      .shell[data-col="true"] .deck {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .btn {
+        min-height: 3rem
+      }
+
+      .lesson {
+        overflow-wrap: break-word
+      }
+
+      /* code is wide: smaller mono text, scrolls sideways inside its box */
+      pre.code {
+        font-size: .8125rem
+      }
+
+      .screen {
+        font-size: .875rem
+      }
+
+      pre.code[data-trace] {
+        max-height: 34vh
+      }
+
+      .g {
+        height: calc(var(--u)*5)
+      }
+
+      /* bigger tap area, icon stays in the corner */
+      .nav {
+        width: 2.75rem;
+        height: 2.75rem
+      }
+    }
+
+    /* PHONE SIDEWAYS (short window): keep the lesson visible above the buttons */
+    @media (max-height:480px) and (orientation:landscape) {
+      :root {
+        --u: .5rem;
+        --fs-1: .9375rem;
+        --fs-2: 1rem;
+        --fs-3: 1.25rem;
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px)
+      }
+
+      .deck {
+        max-height: 45dvh
+      }
+
+      .shell[data-col="false"] .deck {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .btn {
+        min-height: 2.5rem
+      }
+
+      pre.code[data-trace] {
+        max-height: 40vh
+      }
+    }
   </style>
 </head>
 
 <body>
+  <button class="nav nav-l" id="prev" type="button" aria-label="Previous page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+      stroke-linejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+  </button>
+  <button class="nav nav-r" id="next" type="button" aria-label="Next page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+      stroke-linejoin="round"><path d="M9 5l7 7-7 7" /></svg>
+  </button>
+
   <main class="shell" id="app" data-kind="learn" data-col="false">
     <iframe class="stage" id="stage" sandbox="allow-scripts" title="lesson"></iframe>
     <div class="deck" id="deck" role="group"></div>
@@ -735,6 +896,7 @@
       stage.srcdoc = page(v.html, v.trace);
     }
     let TK = -1; /* current trace step, so a late-loading iframe can catch up */
+    let cur = 0; /* index of the lesson page being shown right now */
     const learnView = (html, run, kind = 'learn') => ({ kind, col: false, html, btns: [{ t: S.ok, run }] });
     const restart = html => ({ kind: 'learn', col: false, html, btns: [{ t: S.again, run: () => load(0) }] });
     const after = L => L.next == null ? show(restart(L.end_html ?? S.end)) : load(L.next);
@@ -757,6 +919,7 @@
       }
     };
     function load(i) {
+      cur = i;
       try {
         const L = LESSONS[i]; if (!L || !Object.hasOwn(STATES, L.state)) throw new Error('bad lesson index ' + i);
         show(STATES[L.state](L, i));
@@ -779,6 +942,12 @@
       } catch { return 0 }
     })();
     load(saved);
+
+    /* corner arrows: save current -/+ 1 and reload; the startup check above resets invalid values to 0 */
+    const jump = d => { try { localStorage.setItem('left_page', cur + d) } catch { } location.reload() };
+    $('prev').onclick = () => jump(-1);
+    $('next').onclick = () => jump(1);
   </script>
 </body>
+
 </html>
